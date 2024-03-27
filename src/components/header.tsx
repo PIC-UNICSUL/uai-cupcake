@@ -1,6 +1,7 @@
 import { Home, UtensilsCrossed } from 'lucide-react'
 
 import CupcakeImg from '../assets/cupcake.svg'
+import { AccountMenu } from './account-menu'
 import { NavLink } from './nav-link'
 import { Separator } from './ui/separator'
 
@@ -17,13 +18,15 @@ export function Header() {
             <Home className="h-4 w-4" />
             Início
           </NavLink>
-          <NavLink to="/orders">
+          <NavLink to="">
             <UtensilsCrossed className="h-4 w-4" />
             Cupcakes
           </NavLink>
         </nav>
 
-        <div className="ml-auto flex items-center space-x-2"></div>
+        <div className="ml-auto flex items-center space-x-2">
+          <AccountMenu />
+        </div>
       </div>
     </div>
   )
