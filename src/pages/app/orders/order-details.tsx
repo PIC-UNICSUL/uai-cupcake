@@ -1,105 +1,134 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { FormProvider, useForm } from 'react-hook-form'
+import * as zod from 'zod'
+
+import { StatusMenu } from '@/components/menus'
+import { Button } from '@/components/ui/button'
 import {
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { Separator } from '@/components/ui/separator'
 import {
   Table,
   TableBody,
   TableCell,
-  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
 
+enum StatusDetails {
+  pending = 'Pendente',
+  prodessing = 'Em preparo',
+  ready = 'Pronto',
+  delivered = 'Entregue',
+  canceled = 'Cancelado',
+}
+
+const confirmStatusFormSchema = zod.object({
+  status: zod.nativeEnum(StatusDetails),
+})
+
+export type ConfirmStatusFormData = zod.infer<typeof confirmStatusFormSchema>
+
 export function OrderDetails() {
+  const confirmStatusForm = useForm<ConfirmStatusFormData>({
+    resolver: zodResolver(confirmStatusFormSchema),
+    defaultValues: {
+      status: StatusDetails.pending,
+    },
+  })
+
+  const {
+    handleSubmit,
+    formState: { isSubmitting },
+  } = confirmStatusForm
+
+  const handleConfirmStatus = async (data: ConfirmStatusFormData) => {
+    console.log(data)
+  }
+
   return (
     <DialogContent>
       <DialogHeader>
-        <DialogTitle>Pedido: 1024dsd545dsd23</DialogTitle>
+        <DialogTitle>Pedido: 12</DialogTitle>
         <DialogDescription>Detalhes do pedido</DialogDescription>
       </DialogHeader>
+      <FormProvider {...confirmStatusForm}>
+        <form onSubmit={handleSubmit(handleConfirmStatus)}>
+          <div className="mb-2 flex justify-end">
+            <StatusMenu />
+          </div>
 
-      <div className="space-y-6">
-        <Table>
-          <TableBody>
-            <TableRow>
-              <TableCell className="text-muted-foreground">Status</TableCell>
-              <TableCell className="flex justify-end">
-                <div className="flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-slate-400" />
-                  <span className="font-medium text-muted-foreground">
-                    Pendente
-                  </span>
+          <div className="w-full">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>N. PEDIDO</TableHead>
+                  <TableHead>QUANTIDADE</TableHead>
+                  <TableHead>VALOR TOTAL</TableHead>
+                  <TableHead>DATA DA COMPRA</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow>
+                  <TableCell className="font-medium text-muted-foreground">
+                    12
+                  </TableCell>
+                  <TableCell className="font-medium text-muted-foreground">
+                    1
+                  </TableCell>
+                  <TableCell className="font-medium text-muted-foreground">
+                    R$ 12,00
+                  </TableCell>
+                  <TableCell className="font-medium text-muted-foreground">
+                    12/12/2012
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+            <Separator className="my-6 h-px w-full" />
+
+            <div className="mb-8 flex flex-col gap-4">
+              <div>
+                <p className="text-sm font-semibold">NOME</p>
+                <p className="text-sm text-muted-foreground">
+                  Lucas Monentenegro
+                </p>
+              </div>
+              <div className="flex gap-6">
+                <div>
+                  <p className="text-sm font-semibold">CONTATO</p>
+                  <p className="text-sm text-muted-foreground">
+                    (99) 99999-9999
+                  </p>
                 </div>
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell className="text-muted-foreground">Cliente</TableCell>
-              <TableCell className="flex justify-end">
-                Lucas Montenegro Nunes dos Santos
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell className="text-muted-foreground">Telefone</TableCell>
-              <TableCell className="flex justify-end">
-                (61) 99999-9999
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell className="text-muted-foreground">E-mail</TableCell>
-              <TableCell className="flex justify-end">
-                lucas.montenegro.n@gmail.com
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell className="text-muted-foreground">
-                Realizado há
-              </TableCell>
-              <TableCell className="flex justify-end">há 3 minutos</TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Produto</TableHead>
-              <TableHead className="text-right">Qtd.</TableHead>
-              <TableHead className="text-right">Preço</TableHead>
-              <TableHead className="text-right">Subtotal</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow>
-              <TableCell>Pizza Pepperoni</TableCell>
-              <TableCell className="text-right">2</TableCell>
-              <TableCell className="text-right">R$ 12,00</TableCell>
-              <TableCell className="text-right">R$ 24,00</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>Pizza Mussarela</TableCell>
-              <TableCell className="text-right">1</TableCell>
-              <TableCell className="text-right">R$ 12,00</TableCell>
-              <TableCell className="text-right">R$ 12,00</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>Pizza Calabresa</TableCell>
-              <TableCell className="text-right">1</TableCell>
-              <TableCell className="text-right">R$ 12,00</TableCell>
-              <TableCell className="text-right">R$ 12,00</TableCell>
-            </TableRow>
-          </TableBody>
-          <TableFooter>
-            <TableRow>
-              <TableCell colSpan={3}>Total do pedido</TableCell>
-              <TableCell className="text-right font-medium">R$ 48,00</TableCell>
-            </TableRow>
-          </TableFooter>
-        </Table>
-      </div>
+                <div>
+                  <p className="text-sm font-semibold">E-MAIL</p>
+                  <p className="text-sm text-muted-foreground">
+                    email@email.com
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="destructive" className="px-14 py-6">
+              Cancelar
+            </Button>
+            <Button
+              variant="outline"
+              className="px-14 py-6"
+              disabled={isSubmitting}
+            >
+              Salvar
+            </Button>
+          </div>
+        </form>
+      </FormProvider>
     </DialogContent>
   )
 }
