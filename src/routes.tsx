@@ -5,22 +5,33 @@ import { AuthLayout } from './pages/_layouts/auth'
 import { NotFound } from './pages/404'
 import { Home } from './pages/app/home/home'
 import { Orders } from './pages/app/orders/orders'
+import { Products } from './pages/app/products/products'
 import { SignIn } from './pages/auth/sign-in'
 import { SignUp } from './pages/auth/sign-up'
 
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <AppLayout />,
     errorElement: <NotFound />,
     children: [
       {
         path: '/',
         element: <Home />,
       },
+    ],
+  },
+  {
+    path: '/',
+    element: <AppLayout />,
+    errorElement: <NotFound />,
+    children: [
       {
         path: '/orders',
         element: <Orders />,
+      },
+      {
+        path: '/products',
+        element: <Products />,
       },
     ],
   },

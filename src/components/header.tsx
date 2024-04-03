@@ -1,7 +1,7 @@
 import { Home, UtensilsCrossed } from 'lucide-react'
 
-import CupcakeImg from '../assets/cupcake.svg'
 import { AccountMenu } from './account-menu'
+import { Logo } from './logo'
 import { NavLink } from './nav-link'
 import { Separator } from './ui/separator'
 
@@ -9,7 +9,7 @@ export function Header() {
   return (
     <div className="border-b">
       <div className="flex h-16 items-center gap-6 px-6">
-        <img src={CupcakeImg} alt="logo" className="h-6 w-6" />
+        <Logo className="h-6 w-6 fill-foreground" />
 
         <Separator orientation="vertical" className="h-6" />
 
@@ -18,7 +18,7 @@ export function Header() {
             <Home className="h-4 w-4" />
             Início
           </NavLink>
-          <NavLink to="">
+          <NavLink to="/products">
             <UtensilsCrossed className="h-4 w-4" />
             Cupcakes
           </NavLink>

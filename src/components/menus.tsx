@@ -1,3 +1,5 @@
+import { ComponentProps, ReactNode } from 'react'
+
 import {
   Select,
   SelectContent,
@@ -5,6 +7,39 @@ import {
   SelectTrigger,
   SelectValue,
 } from './ui/select'
+
+interface SelectMenuProps extends ComponentProps<typeof Select> {
+  placeholder?: string
+  children: ReactNode
+  size?: 'base' | 'large' | 'medium'
+}
+
+export function SelectMenu({
+  placeholder,
+  children,
+  size,
+  ...props
+}: SelectMenuProps) {
+  return (
+    <div>
+      <Select {...props}>
+        <SelectTrigger
+          className={`${
+            (size === 'large' && 'w-[180px]') ||
+            (size === 'base' && 'w-[130px]') ||
+            (size === 'medium' && 'w-[150px]')
+          }`}
+        >
+          {!!placeholder && (
+            <span className="text-muted-foreground">{placeholder}</span>
+          )}
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent className="font-semibold">{children}</SelectContent>
+      </Select>
+    </div>
+  )
+}
 
 export function DateMenu() {
   return (
@@ -17,25 +52,6 @@ export function DateMenu() {
           <SelectItem value="mounth">Último mês</SelectItem>
           <SelectItem value="weak">Última semana</SelectItem>
           <SelectItem value="year">Último ano</SelectItem>
-        </SelectContent>
-      </Select>
-    </div>
-  )
-}
-
-export function StatusMenu() {
-  return (
-    <div>
-      <Select defaultValue="pending">
-        <SelectTrigger className="w-[130px] gap-2 font-semibold">
-          <SelectValue placeholder="Status" />
-        </SelectTrigger>
-        <SelectContent className="font-semibold">
-          <SelectItem value="pending">Pendente</SelectItem>
-          <SelectItem value="prodessing">Em preparo</SelectItem>
-          <SelectItem value="ready">Pronto</SelectItem>
-          <SelectItem value="delivered">Entregue</SelectItem>
-          <SelectItem value="canceled">Cancelado</SelectItem>
         </SelectContent>
       </Select>
     </div>

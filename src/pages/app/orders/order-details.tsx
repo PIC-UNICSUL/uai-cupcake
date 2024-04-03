@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { FormProvider, useForm } from 'react-hook-form'
 import * as zod from 'zod'
 
-import { StatusMenu } from '@/components/menus'
+import { SelectMenu } from '@/components/menus'
 import { Button } from '@/components/ui/button'
 import {
   DialogContent,
@@ -10,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { SelectItem } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import {
   Table,
@@ -59,8 +60,15 @@ export function OrderDetails() {
       </DialogHeader>
       <FormProvider {...confirmStatusForm}>
         <form onSubmit={handleSubmit(handleConfirmStatus)}>
-          <div className="mb-2 flex justify-end">
-            <StatusMenu />
+          <div className="mb-2 flex items-center justify-end gap-2">
+            <p>Status:</p>
+            <SelectMenu defaultValue="pending" size="base">
+              <SelectItem value="pending">Pendente</SelectItem>
+              <SelectItem value="prodessing">Em preparo</SelectItem>
+              <SelectItem value="ready">Pronto</SelectItem>
+              <SelectItem value="delivered">Entregue</SelectItem>
+              <SelectItem value="canceled">Cancelado</SelectItem>
+            </SelectMenu>
           </div>
 
           <div className="w-full">

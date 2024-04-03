@@ -1,7 +1,8 @@
 import { Helmet } from 'react-helmet-async'
 
-import { DateMenu } from '@/components/menus'
+import { SelectMenu } from '@/components/menus'
 import { Pagination } from '@/components/pagination'
+import { SelectItem } from '@/components/ui/select'
 import {
   Table,
   TableBody,
@@ -19,7 +20,11 @@ export function Orders() {
       <div className="flex flex-col gap-4">
         <div className="flex justify-between">
           <h1 className="text-3xl font-bold tracking-tight">Pedidos</h1>
-          <DateMenu />
+          <SelectMenu defaultValue="mounth" size="medium">
+            <SelectItem value="mounth">Último mês</SelectItem>
+            <SelectItem value="weak">Última semana</SelectItem>
+            <SelectItem value="year">Último ano</SelectItem>
+          </SelectMenu>
         </div>
 
         <div className="rounded-md border">
