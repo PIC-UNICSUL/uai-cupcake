@@ -21,7 +21,7 @@ export function Products() {
 
   return (
     <div className="flex min-h-screen flex-col gap-6">
-      <div className="w-1/3 ">
+      <div className="w-1/3">
         <p className="text-semibold text-4xl">Todos</p>
         <p className="text-muted-foreground">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do

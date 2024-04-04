@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
@@ -17,6 +17,7 @@ type SignInSchema = z.infer<typeof signInSchema>
 
 export function SignIn() {
   const [searchParams] = useSearchParams()
+  const navigate = useNavigate()
 
   const {
     register,
@@ -31,12 +32,14 @@ export function SignIn() {
 
   async function handleAuthenticate({ email, password }: SignInSchema) {
     try {
-      toast.success('Enviamos um link de autenticação para seu e-mail.', {
-        action: {
-          label: 'Reenviar',
-          onClick: () => handleAuthenticate({ email, password }),
-        },
-      })
+      if (
+        email === 'lucas.montenegro.n@outlook.com' &&
+        password === '123456789'
+      ) {
+        return navigate('/')
+      }
+
+      return toast.error('Credenciais inválidas')
     } catch (err) {
       toast.error('Credenciais inválidas')
     }

@@ -10,7 +10,7 @@ export function App() {
   return (
     <HelmetProvider>
       <Helmet titleTemplate="%s | UAI Cupcake" />
-      <Toaster />
+      <Toaster richColors />
       <RouterProvider router={router} />
     </HelmetProvider>
   )

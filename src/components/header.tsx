@@ -1,9 +1,11 @@
-import { Home, UtensilsCrossed } from 'lucide-react'
+import { Home, ShoppingCart, UtensilsCrossed } from 'lucide-react'
 
 import { AccountMenu } from './account-menu'
+import { Cart } from './cart'
 import { Logo } from './logo'
 import { NavLink } from './nav-link'
 import { Separator } from './ui/separator'
+import { Sheet, SheetTrigger } from './ui/sheet'
 
 export function Header() {
   return (
@@ -24,7 +26,18 @@ export function Header() {
           </NavLink>
         </nav>
 
-        <div className="ml-auto flex items-center space-x-2">
+        <div className="ml-auto flex items-center gap-1 space-x-2">
+          <div className="flex justify-center rounded-lg border hover:bg-muted">
+            <Sheet>
+              <SheetTrigger className="p-2">
+                <span className="absolute right-[150px] top-[5px] z-[5]  rounded-full bg-primary px-2 py-[0.1rem] text-muted">
+                  1
+                </span>
+                <ShoppingCart className="h-5 w-5" />
+              </SheetTrigger>
+              <Cart />
+            </Sheet>
+          </div>
           <AccountMenu />
         </div>
       </div>

@@ -1,16 +1,20 @@
-import { Minus, Plus } from 'lucide-react'
+import { ShoppingCart } from 'lucide-react'
+import { useState } from 'react'
 
-interface ProductDetailsProps {
-  quantity: number
-  onIncrease: () => void
-  onDecrease: () => void
-}
+import { QuantityInput } from '@/components/quantity-input'
+import { Button } from '@/components/ui/button'
 
-export function ProductDetails({
-  quantity,
-  onIncrease,
-  onDecrease,
-}: ProductDetailsProps) {
+export function ProductDetails() {
+  const [quantity, setQuantity] = useState(1)
+
+  function handleIncrease() {
+    setQuantity((prev) => prev + 1)
+  }
+
+  function handleDecrease() {
+    setQuantity((prev) => prev - 1)
+  }
+
   return (
     <div className="pb-4">
       <div className="flex w-full items-end justify-between">
@@ -23,25 +27,17 @@ export function ProductDetails({
             <p className="text-xl font-semibold">R$ 00,00</p>
           </div>
         </div>
-        <div className="flex flex-col items-center rounded-md">
-          <span className="text-muted-foreground">Quantidade</span>
-          <div className="flex items-center rounded-md border">
-            <button
-              className="cursor-pointer border-none bg-none py-4 pl-4 text-foreground duration-100 disabled:cursor-default disabled:opacity-40"
-              onClick={onDecrease}
-              disabled={quantity <= 1}
-            >
-              <Minus size={13} />
-            </button>
-            <span className="align-center bg-trasparent mx-1 flex w-5 items-center justify-center border-none px-6 py-4 focus:outline-none">
-              {quantity}
-            </span>
-            <button
-              className="cursor-pointer border-none bg-none py-4 pr-4 text-foreground duration-100 disabled:cursor-default disabled:opacity-40 "
-              onClick={onIncrease}
-            >
-              <Plus size={13} />
-            </button>
+        <div className="flex flex-col rounded-md">
+          <span className="p-1 text-muted-foreground">Quantidade</span>
+          <div className="flex items-center gap-4">
+            <QuantityInput
+              quantity={quantity}
+              onIncrease={handleIncrease}
+              onDecrease={handleDecrease}
+            />
+            <Button title="Adicionar ao carrinho" className="p-6">
+              <ShoppingCart className="h-5 w-5" />
+            </Button>
           </div>
         </div>
       </div>

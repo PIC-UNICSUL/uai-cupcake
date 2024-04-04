@@ -38,8 +38,10 @@ export function AccountMenu() {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem>
-          <Contact className="mr-2 h-4 w-4" />
-          <span>Meus dados</span>
+          <Link to="/profile" className="flex items-center">
+            <Contact className="mr-2 h-4 w-4" />
+            <span>Meus dados</span>
+          </Link>
         </DropdownMenuItem>
         <DropdownMenuItem className="text-rose-500 dark:text-rose-400">
           <LogOut className="mr-2 h-4 w-4" />
