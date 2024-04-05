@@ -51,6 +51,7 @@ export function Orders() {
                   <TableHead>VALOR TOTAL</TableHead>
                   <TableHead>DATA DA COMPRA</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Detalhes</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

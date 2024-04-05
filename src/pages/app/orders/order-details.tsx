@@ -10,12 +10,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { SelectItem } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import {
   Table,
   TableBody,
   TableCell,
+  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -53,59 +55,104 @@ export function OrderDetails() {
   }
 
   return (
-    <DialogContent>
+    <DialogContent className="sm:max-w-[520px]">
       <DialogHeader>
-        <DialogTitle>Pedido: 12</DialogTitle>
+        <DialogTitle className="flex items-center gap-2">
+          Pedido: 12
+        </DialogTitle>
         <DialogDescription>Detalhes do pedido</DialogDescription>
       </DialogHeader>
-      <FormProvider {...confirmStatusForm}>
-        <form onSubmit={handleSubmit(handleConfirmStatus)}>
-          <div className="mb-2 flex items-center justify-end gap-2">
-            <p>Status:</p>
-            <SelectMenu defaultValue="pending" size="base">
-              <SelectItem value="pending">Pendente</SelectItem>
-              <SelectItem value="prodessing">Em preparo</SelectItem>
-              <SelectItem value="ready">Pronto</SelectItem>
-              <SelectItem value="delivered">Entregue</SelectItem>
-              <SelectItem value="canceled">Cancelado</SelectItem>
-            </SelectMenu>
-          </div>
+      <div className="space-y-6">
+        <div className="space-y-6">
+          <div>
+            <ScrollArea className="h-52">
+              <Table className="w-full">
+                <TableHeader className="sticky top-0">
+                  <TableRow>
+                    <TableHead>Produto</TableHead>
+                    <TableHead className="text-right">Categoria</TableHead>
+                    <TableHead className="text-right">Qtd.</TableHead>
+                    <TableHead className="text-right">Preço</TableHead>
+                    <TableHead className="text-right">Subtotal</TableHead>
+                  </TableRow>
+                </TableHeader>
 
-          <div className="w-full">
-            <Table>
-              <TableHeader>
+                <TableBody>
+                  <TableRow>
+                    <TableCell>Pistache</TableCell>
+                    <TableCell className="text-right">Tradicional</TableCell>
+                    <TableCell className="text-right">4</TableCell>
+                    <TableCell className="text-right">R$ 15,00</TableCell>
+                    <TableCell className="text-right">R$ 60,00</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Pistache</TableCell>
+                    <TableCell className="text-right">Tradicional</TableCell>
+                    <TableCell className="text-right">4</TableCell>
+                    <TableCell className="text-right">R$ 15,00</TableCell>
+                    <TableCell className="text-right">R$ 60,00</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Pistache</TableCell>
+                    <TableCell className="text-right">Tradicional</TableCell>
+                    <TableCell className="text-right">4</TableCell>
+                    <TableCell className="text-right">R$ 15,00</TableCell>
+                    <TableCell className="text-right">R$ 60,00</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Pistache</TableCell>
+                    <TableCell className="text-right">Tradicional</TableCell>
+                    <TableCell className="text-right">4</TableCell>
+                    <TableCell className="text-right">R$ 15,00</TableCell>
+                    <TableCell className="text-right">R$ 60,00</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Pistache</TableCell>
+                    <TableCell className="text-right">Tradicional</TableCell>
+                    <TableCell className="text-right">4</TableCell>
+                    <TableCell className="text-right">R$ 15,00</TableCell>
+                    <TableCell className="text-right">R$ 60,00</TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </ScrollArea>
+
+            <Table className="">
+              <TableFooter className="border-0 border-b-2">
                 <TableRow>
-                  <TableHead>N. PEDIDO</TableHead>
-                  <TableHead>QUANTIDADE</TableHead>
-                  <TableHead>VALOR TOTAL</TableHead>
-                  <TableHead>DATA DA COMPRA</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow>
-                  <TableCell className="font-medium text-muted-foreground">
-                    12
-                  </TableCell>
-                  <TableCell className="font-medium text-muted-foreground">
-                    1
-                  </TableCell>
-                  <TableCell className="font-medium text-muted-foreground">
-                    R$ 12,00
-                  </TableCell>
-                  <TableCell className="font-medium text-muted-foreground">
-                    12/12/2012
+                  <TableCell colSpan={4}>Total do pedido</TableCell>
+                  <TableCell className="text-right font-medium">
+                    R$ 60,00
                   </TableCell>
                 </TableRow>
-              </TableBody>
+              </TableFooter>
             </Table>
-            <Separator className="my-6 h-px w-full" />
+          </div>
+        </div>
 
+        <Separator className="my-6 h-px w-full" />
+
+        <FormProvider {...confirmStatusForm}>
+          <form onSubmit={handleSubmit(handleConfirmStatus)}>
             <div className="mb-8 flex flex-col gap-4">
-              <div>
-                <p className="text-sm font-semibold">NOME</p>
-                <p className="text-sm text-muted-foreground">
-                  Lucas Monentenegro
-                </p>
+              <div className="flex gap-4">
+                <div>
+                  <p className="text-sm font-semibold">NOME</p>
+                  <p className="text-sm text-muted-foreground">
+                    Lucas Monentenegro
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-end gap-2">
+                  <p>Status:</p>
+                  <SelectMenu defaultValue="pending" size="base">
+                    <SelectItem value="pending">Pendente</SelectItem>
+                    <SelectItem value="prodessing">Em preparo</SelectItem>
+                    <SelectItem value="ready">Pronto</SelectItem>
+                    <SelectItem value="delivered">Entregue</SelectItem>
+                    <SelectItem value="canceled">Cancelado</SelectItem>
+                  </SelectMenu>
+                </div>
               </div>
               <div className="flex gap-6">
                 <div>
@@ -120,23 +167,62 @@ export function OrderDetails() {
                     email@email.com
                   </p>
                 </div>
+                <div>
+                  <p className="text-sm font-semibold">Criado há</p>
+                  <p className="text-sm text-muted-foreground">12/12/2012</p>
+                </div>
               </div>
             </div>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="destructive" className="px-14 py-6">
-              Cancelar
-            </Button>
-            <Button
-              variant="outline"
-              className="px-14 py-6"
-              disabled={isSubmitting}
-            >
-              Salvar
-            </Button>
-          </div>
-        </form>
-      </FormProvider>
+
+            <div className="mt-4">
+              <Button
+                variant="outline"
+                className="px-14 py-6"
+                disabled={isSubmitting}
+              >
+                Salvar
+              </Button>
+            </div>
+          </form>
+        </FormProvider>
+      </div>
     </DialogContent>
   )
 }
+
+/* <div className="mb-8 flex flex-col gap-4">
+          <div className="flex gap-4">
+            <div>
+              <p className="text-sm font-semibold">NOME</p>
+              <p className="text-sm text-muted-foreground">
+                Lucas Monentenegro
+              </p>
+            </div>
+
+            <div>
+              <div>
+                <p className="text-sm font-semibold uppercase">Status</p>
+                <div className="flex items-center gap-1">
+                  <span className="h-2 w-2 rounded-full bg-slate-400"></span>
+                  <span className="font-medium text-muted-foreground">
+                    Pendente
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="flex gap-6">
+            <div>
+              <p className="text-sm font-semibold">CONTATO</p>
+              <p className="text-sm text-muted-foreground">(99) 99999-9999</p>
+            </div>
+            <div>
+              <p className="text-sm font-semibold">E-MAIL</p>
+              <p className="text-sm text-muted-foreground">email@email.com</p>
+            </div>
+            <div>
+              <p className="text-sm font-semibold">Criado há</p>
+              <p className="text-sm text-muted-foreground">12/12/2012</p>
+            </div>
+          </div>
+        </div> */
