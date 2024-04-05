@@ -92,24 +92,24 @@ export function Products() {
           </div>
           <div>
             <ProductDetails
+              quantity={quantity}
               onIncrease={handleIncrease}
               onDecrease={handleDecrease}
-              quantity={quantity}
             />
             <ProductDetails
+              quantity={quantity}
               onIncrease={handleIncrease}
               onDecrease={handleDecrease}
-              quantity={quantity}
             />
             <ProductDetails
+              quantity={quantity}
               onIncrease={handleIncrease}
               onDecrease={handleDecrease}
-              quantity={quantity}
             />
             <ProductDetails
+              quantity={quantity}
               onIncrease={handleIncrease}
               onDecrease={handleDecrease}
-              quantity={quantity}
             />
             <ProductDetails
               onIncrease={handleIncrease}

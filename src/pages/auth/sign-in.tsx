@@ -74,7 +74,7 @@ export function SignIn() {
                   {...register('password')}
                 />
                 <Link
-                  to="/forgot-password"
+                  to="/forget-password"
                   className="text-sm text-muted-foreground hover:text-foreground"
                 >
                   Esqueci minha senha

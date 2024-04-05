@@ -8,6 +8,8 @@ import { Home } from './pages/app/home/home'
 import { Orders } from './pages/app/orders/orders'
 import { Products } from './pages/app/products/products'
 import { Profile } from './pages/app/profile/profile'
+import { ForgetPassword } from './pages/auth/forget-password'
+import { NewPassword } from './pages/auth/new-password'
 import { SignIn } from './pages/auth/sign-in'
 import { SignUp } from './pages/auth/sign-up'
 
@@ -56,6 +58,14 @@ export const router = createBrowserRouter([
       {
         path: '/sign-up',
         element: <SignUp />,
+      },
+      {
+        path: '/forget-password',
+        element: <ForgetPassword />,
+      },
+      {
+        path: '/new-password',
+        element: <NewPassword />,
       },
     ],
   },
