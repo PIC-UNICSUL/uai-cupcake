@@ -38,6 +38,7 @@ export function Home() {
 
             {/* Seção dos cards */}
             <div className="flex w-full justify-center space-x-4 pb-12 pt-6">
+              
               <CardProduct
                 img="/cupcakeDes.jpg"
                 name="Nome do Card"

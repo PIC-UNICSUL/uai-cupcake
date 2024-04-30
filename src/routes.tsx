@@ -12,6 +12,7 @@ import { ForgetPassword } from './pages/auth/forget-password'
 import { NewPassword } from './pages/auth/new-password'
 import { SignIn } from './pages/auth/sign-in'
 import { SignUp } from './pages/auth/sign-up'
+import { Contact } from './pages/app/contact/contact'
 
 export const router = createBrowserRouter([
   {
@@ -66,6 +67,10 @@ export const router = createBrowserRouter([
       {
         path: '/new-password',
         element: <NewPassword />,
+      },
+      {
+        path: '/contact',
+        element: <Contact />,
       },
     ],
   },

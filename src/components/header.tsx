@@ -1,5 +1,5 @@
 import { Home, ShoppingCart, UtensilsCrossed } from 'lucide-react'
-
+import { useState } from 'react' 
 import { AccountMenu } from './account-menu'
 import { Cart } from './cart'
 import { Logo } from './logo'
@@ -8,6 +8,8 @@ import { Separator } from './ui/separator'
 import { Sheet, SheetTrigger } from './ui/sheet'
 
 export function Header() {
+  const [user, setUser] = useState(false)
+
   return (
     <div className="border-b">
       <div className="flex h-16 items-center gap-6 px-6">
@@ -26,8 +28,9 @@ export function Header() {
           </NavLink>
         </nav>
 
+          {user === true ? (
         <div className="ml-auto flex items-center gap-1 space-x-2">
-          <div className="flex justify-center rounded-lg border hover:bg-muted">
+            <div className="flex justify-center rounded-lg border hover:bg-muted">
             <Sheet>
               <SheetTrigger className="p-2">
                 <span className="absolute right-[150px] top-[5px] z-[5]  rounded-full bg-primary px-2 py-[0.1rem] text-muted">
@@ -40,6 +43,16 @@ export function Header() {
           </div>
           <AccountMenu />
         </div>
+          ) : (
+            <div className="ml-auto flex items-center gap-1 space-x-2">
+              <NavLink to="/sign-in">
+                Entrar
+              </NavLink>
+              <NavLink to="/contact">
+                Contato
+              </NavLink>
+            </div>
+          )}
       </div>
     </div>
   )

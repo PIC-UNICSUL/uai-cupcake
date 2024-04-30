@@ -7,17 +7,24 @@ import { Label } from '@/components/ui/label'
 import { SelectItem } from '@/components/ui/select'
 
 import { ProductDetails } from './product-details'
+import { Cupcakes } from '@/mock/Cupcakes'
+
+export interface CupcakesInfo {
+  id: number;
+    name: string;
+    img: string;
+    description: string;
+    categories: string[];
+    priceInCents: number;
+}
 
 export function Products() {
-  const [quantity, setQuantity] = useState(1)
+  const [cupcakes, setCupcakes] = useState<CupcakesInfo[]>([])
 
-  function handleIncrease() {
-    setQuantity((state) => state + 1)
-  }
+  if (cupcakes.length === 0) {
+    setCupcakes(Cupcakes)
+}
 
-  function handleDecrease() {
-    setQuantity((state) => state - 1)
-  }
 
   return (
     <div className="flex min-h-screen flex-col gap-6">
@@ -72,6 +79,7 @@ export function Products() {
             </div>
           </div>
         </div>
+        {cupcakes.length > 0 ? (
         <div>
           <div className="flex flex-col items-end pb-11">
             <div className="flex flex-col items-center">
@@ -87,42 +95,26 @@ export function Products() {
                 <SelectItem value="item4">Item4</SelectItem>
                 <SelectItem value="item5">Item5</SelectItem>
               </SelectMenu>
-              <p className="text-sm">100 produtos encontrados</p>
+              <p className="text-sm">{cupcakes.length} produtos encontrados</p>
+            </div>
+            <div className='flex flex-col gap-4'>
+              {cupcakes.map(cupcake => {
+                  return (
+                    <ProductDetails
+                      key={cupcake.id}
+                      cupcake={cupcake}
+                    />
+                  )
+                })}
+            </div>
             </div>
           </div>
-          <div>
-            <ProductDetails
-              quantity={quantity}
-              onIncrease={handleIncrease}
-              onDecrease={handleDecrease}
-            />
-            <ProductDetails
-              quantity={quantity}
-              onIncrease={handleIncrease}
-              onDecrease={handleDecrease}
-            />
-            <ProductDetails
-              quantity={quantity}
-              onIncrease={handleIncrease}
-              onDecrease={handleDecrease}
-            />
-            <ProductDetails
-              quantity={quantity}
-              onIncrease={handleIncrease}
-              onDecrease={handleDecrease}
-            />
-            <ProductDetails
-              onIncrease={handleIncrease}
-              onDecrease={handleDecrease}
-              quantity={quantity}
-            />
-            <ProductDetails
-              onIncrease={handleIncrease}
-              onDecrease={handleDecrease}
-              quantity={quantity}
-            />
-          </div>
-        </div>
+            ): (
+              <div className='h-full flex justify-center items-center'>
+                <p className='font-semibold text-2xl'>Nenhum produto encontrado</p>
+              </div>
+            )}
+           
       </div>
     </div>
   )
