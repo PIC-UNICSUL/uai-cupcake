@@ -7,10 +7,17 @@ import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useStore } from '@/store'
 
 const signInSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
+  email: z
+    .string()
+    .nonempty('Preencha com o e-mail cadastrado')
+    .email('E-mail inválido'),
+  password: z
+    .string()
+    .nonempty('Preencha com a senha cadastrada')
+    .min(8, 'Senha incorreta'),
 })
 
 type SignInSchema = z.infer<typeof signInSchema>
@@ -18,11 +25,12 @@ type SignInSchema = z.infer<typeof signInSchema>
 export function SignIn() {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
+  const { signin } = useStore()
 
   const {
     register,
     handleSubmit,
-    formState: { isSubmitting },
+    formState: { isSubmitting, errors },
   } = useForm<SignInSchema>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
@@ -32,24 +40,27 @@ export function SignIn() {
 
   async function handleAuthenticate({ email, password }: SignInSchema) {
     try {
-      if (
-        email === 'lucas.montenegro.n@outlook.com' &&
-        password === '123456789'
-      ) {
-        return navigate('/')
+      await new Promise((resolve) => setTimeout(resolve, 2000))
+      const errorMessage = signin(email, password)
+
+      if (typeof errorMessage === 'string') {
+        toast.error(errorMessage)
+        return
       }
 
-      return toast.error('Credenciais inválidas')
+      navigate('/')
     } catch (err) {
       toast.error('Credenciais inválidas')
     }
   }
 
   return (
-    <div className="lg:p-8">
-      <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
+    <div className="w-full lg:p-8">
+      <div className="mx-auto flex h-screen max-w-80 flex-col justify-center space-y-6 lg:h-full">
         <div className="flex flex-col space-y-2 text-center">
-          <h1 className="text-2xl font-semibold tracking-tight">Login</h1>
+          <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
+            Login
+          </h1>
         </div>
 
         <div className="grid gap-6">
@@ -65,6 +76,9 @@ export function SignIn() {
                   autoCorrect="off"
                   {...register('email')}
                 />
+                {errors.email && (
+                  <p className="text-red-500">{errors.email.message}</p>
+                )}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="password">Sua senha</Label>
@@ -73,6 +87,9 @@ export function SignIn() {
                   type="password"
                   {...register('password')}
                 />
+                {errors.password && (
+                  <p className="text-red-500">{errors.password.message}</p>
+                )}
                 <Link
                   to="/forget-password"
                   className="text-sm text-muted-foreground hover:text-foreground"
