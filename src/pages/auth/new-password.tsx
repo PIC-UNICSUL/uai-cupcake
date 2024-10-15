@@ -25,8 +25,8 @@ export function NewPassword() {
   }
 
   return (
-    <div className="lg:p-8">
-      <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
+    <div className="w-full lg:p-8">
+      <div className="mx-auto flex h-screen w-full max-w-80 flex-col justify-center space-y-6 lg:h-full">
         <div className="flex flex-col space-y-2 text-center">
           <h1 className="text-2xl font-semibold tracking-tight">Nova senha</h1>
         </div>

@@ -1,18 +1,19 @@
 import { createBrowserRouter } from 'react-router-dom'
 
+import { RequireAuth } from './pages/auth/RequireAuth'
 import { AppLayout } from './pages/_layouts/app'
 import { AuthLayout } from './pages/_layouts/auth'
 import { NotFound } from './pages/404'
-import { Checkout } from './pages/app/checkout/checkout'
-import { Home } from './pages/app/home/home'
-import { Orders } from './pages/app/orders/orders'
-import { Products } from './pages/app/products/products'
-import { Profile } from './pages/app/profile/profile'
+import { Checkout } from './pages/app/checkout'
+import { Contact } from './pages/app/contact'
+import { Home } from './pages/app/home'
+import { Orders } from './pages/app/orders'
+import { Products } from './pages/app/products'
+import { Profile } from './pages/app/profile'
 import { ForgetPassword } from './pages/auth/forget-password'
 import { NewPassword } from './pages/auth/new-password'
 import { SignIn } from './pages/auth/sign-in'
 import { SignUp } from './pages/auth/sign-up'
-import { Contact } from './pages/app/contact/contact'
 
 export const router = createBrowserRouter([
   {
@@ -32,7 +33,11 @@ export const router = createBrowserRouter([
     children: [
       {
         path: '/orders',
-        element: <Orders />,
+        element: (
+          <RequireAuth>
+            <Orders />
+          </RequireAuth>
+        ),
       },
       {
         path: '/products',
@@ -40,11 +45,19 @@ export const router = createBrowserRouter([
       },
       {
         path: '/profile',
-        element: <Profile />,
+        element: (
+          <RequireAuth>
+            <Profile />
+          </RequireAuth>
+        ),
       },
       {
         path: '/checkout',
-        element: <Checkout />,
+        element: (
+          <RequireAuth>
+            <Checkout />
+          </RequireAuth>
+        ),
       },
     ],
   },
