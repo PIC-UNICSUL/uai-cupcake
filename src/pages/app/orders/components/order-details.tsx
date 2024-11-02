@@ -3,6 +3,7 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as zod from 'zod'
 
+import { OrderItems, OrderStatus } from '@/@types/types'
 import { SelectMenu } from '@/components/menus'
 import { Button } from '@/components/ui/button'
 import {
@@ -11,6 +12,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { SelectItem } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
@@ -24,26 +27,28 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { useStore } from '@/store'
-
 import { formatMoney } from '../../products/components/product-details'
-import { CartItem, OrderStatus } from '@/@types/types'
 
 interface OrderDetailsProps {
   id: number
-  order: CartItem[]
-  total: number
+  order: OrderItems[]
+  total: string
   date: string
   status: OrderStatus
   buyerName?: string
   buyerEmail?: string
   buyerPhone?: string
+  receiverName?: string
 }
 
-const confirmStatusFormSchema = zod.object({
-  status: zod.nativeEnum(OrderStatus),
-})
+// Função de fábrica para instanciar o schema
+const createConfirmStatusFormSchema = () =>
+  zod.object({
+    status: zod.nativeEnum(OrderStatus),
+    receiverName: zod.string().optional(),
+  })
 
-export type ConfirmStatusFormData = zod.infer<typeof confirmStatusFormSchema>
+export type ConfirmStatusFormData = zod.infer<ReturnType<typeof createConfirmStatusFormSchema>>
 
 export function OrderDetails({
   order,
@@ -53,27 +58,39 @@ export function OrderDetails({
   status,
   buyerEmail,
   buyerName,
-  buyerPhone
+  buyerPhone,
+  receiverName,
 }: OrderDetailsProps) {
+  const { updateOrderStatus, user, fetchProduct } = useStore()
   const confirmStatusForm = useForm<ConfirmStatusFormData>({
-    resolver: zodResolver(confirmStatusFormSchema),
+    resolver: zodResolver(createConfirmStatusFormSchema()),
     defaultValues: {
       status,
+      receiverName: receiverName || undefined
     },
   })
 
-  const { updateOrderStatus, user } = useStore()
+  const { handleSubmit, formState: { isSubmitting }, setValue, watch } = confirmStatusForm
 
-  const {
-    handleSubmit,
-    formState: { isSubmitting },
-    setValue,
-  } = confirmStatusForm
+  const calculateSubtotal = (price: number, quantity: number) => 
+    formatMoney((price) * quantity)
 
   const handleConfirmStatus = async (data: ConfirmStatusFormData) => {
-    updateOrderStatus(id, data.status)
+    if (data.status === OrderStatus.delivered && !data.receiverName) {
+      toast.error('Por favor, insira o nome de quem retirou o pedido.')
+      return
+    }
+
+    updateOrderStatus(id, data.status, data.receiverName)
     toast.success('Status do pedido atualizado com sucesso!')
   }
+
+  const renderContactInfo = (label: string, value: string | undefined) => (
+    <div>
+      <p className="text-sm font-semibold">{label}</p>
+      <p className="text-sm text-muted-foreground">{value}</p>
+    </div>
+  )
 
   return (
     <DialogContent className="rounded-lg sm:max-w-[520px]">
@@ -84,119 +101,94 @@ export function OrderDetails({
         <DialogDescription>Detalhes do pedido</DialogDescription>
       </DialogHeader>
       <div className="space-y-6">
-        <div className="space-y-6">
-          <div>
-            <ScrollArea className="h-52">
-              <Table className="w-full">
-                <TableHeader className="sticky top-0">
-                  <TableRow>
-                    <TableHead>Produto</TableHead>
-                    <TableHead className="text-right">Categoria</TableHead>
-                    <TableHead className="text-right">Qtd.</TableHead>
-                    <TableHead className="text-right">Preço</TableHead>
-                    <TableHead className="text-right">Subtotal</TableHead>
+        <ScrollArea className="h-52">
+          <Table className="w-full">
+            <TableHeader className="sticky top-0">
+              <TableRow>
+                <TableHead>Produto</TableHead>
+                <TableHead className="text-right">Categoria</TableHead>
+                <TableHead className="text-right">Qtd.</TableHead>
+                <TableHead className="text-right">Preço</TableHead>
+                <TableHead className="text-right">Subtotal</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {order.map((item) => {
+                const product = fetchProduct(item.product_id)
+                return (
+                  <TableRow key={item.order_item_id}>
+                    <TableCell>{product?.name}</TableCell>
+                    <TableCell className="text-right">{product?.category}</TableCell>
+                    <TableCell className="text-right">{item.quantity}</TableCell>
+                    <TableCell className="text-right">
+                      {formatMoney(product?.price || 0)}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {calculateSubtotal(product?.price || 0, item.quantity)}
+                    </TableCell>
                   </TableRow>
-                </TableHeader>
+                )
+              })}
+            </TableBody>
+          </Table>
+        </ScrollArea>
 
-                <TableBody>
-                  {order.map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell>{item.name}</TableCell>
-                      <TableCell className="text-right">
-                        {item.categories[0]}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {item.quantity}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {formatMoney(item.price)}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {formatMoney(item.price * item.quantity)}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </ScrollArea>
-
-            <Table className="">
-              <TableFooter className="border-0 border-b-2">
-                <TableRow>
-                  <TableCell colSpan={4}>Total do pedido</TableCell>
-                  <TableCell className="text-right font-medium">
-                    {formatMoney(total)}
-                  </TableCell>
-                </TableRow>
-              </TableFooter>
-            </Table>
-          </div>
-        </div>
+        <Table>
+          <TableFooter className="border-0 border-b-2">
+            <TableRow>
+              <TableCell colSpan={4}>Total do pedido</TableCell>
+              <TableCell className="text-right font-medium">{total}</TableCell>
+            </TableRow>
+          </TableFooter>
+        </Table>
 
         <Separator className="my-6 h-px w-full" />
-        {user?.admin ? (
+        {user?.user_type === 'admin' ? (
           <FormProvider {...confirmStatusForm}>
             <form onSubmit={handleSubmit(handleConfirmStatus)}>
               <div className="mb-8 flex flex-col gap-4">
                 <div className="flex gap-4">
-                  <div>
-                    <p className="text-sm font-semibold">NOME</p>
-                    <p className="text-sm text-muted-foreground">
-                      {buyerName}
-                    </p>
-                  </div>
-
+                  {renderContactInfo("NOME", buyerName)}
                   <div className="flex items-center justify-end gap-2">
                     <p>Status:</p>
                     <SelectMenu
                       defaultValue={status}
-                      onValueChange={(value) =>
-                        setValue('status', value as OrderStatus)
-                      }
+                      onValueChange={(value) => setValue('status', value as OrderStatus)}
                       size="base"
                     >
-                      <SelectItem value={OrderStatus.pending}>
-                        Pendente
-                      </SelectItem>
-                      <SelectItem value={OrderStatus.preparation}>
-                        Em preparo
-                      </SelectItem>
-                      <SelectItem value={OrderStatus.ready}>Pronto</SelectItem>
-                      <SelectItem value={OrderStatus.delivered}>
-                        Entregue
-                      </SelectItem>
-                      <SelectItem value={OrderStatus.cancelled}>
-                        Cancelado
-                      </SelectItem>
+                      {Object.values(OrderStatus).map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {status}
+                        </SelectItem>
+                      ))}
                     </SelectMenu>
                   </div>
                 </div>
+
                 <div className="flex gap-6">
-                  <div>
-                    <p className="text-sm font-semibold">CONTATO</p>
-                    <p className="text-sm text-muted-foreground">
-                      {buyerPhone}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold">E-MAIL</p>
-                    <p className="text-sm text-muted-foreground">
-                      {buyerEmail}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold">Criado</p>
-                    <p className="text-sm text-muted-foreground">{date}</p>
-                  </div>
+                  {renderContactInfo("CONTATO", buyerPhone)}
+                  {renderContactInfo("E-MAIL", buyerEmail)}
+                  {renderContactInfo("Criado", date)}
                 </div>
               </div>
 
+              {watch('status') === OrderStatus.delivered && (
+                <div className="flex items-center gap-2">
+                  <Label className="text-sm font-semibold">RETIRADO POR: </Label>
+                  {receiverName && user?.user_type !== 'admin' ? (
+                    <p className="text-sm text-muted-foreground">{receiverName}</p>
+                  ) : (
+                    <Input
+                      className="mt-1 rounded border w-2/3 p-2"
+                      {...confirmStatusForm.register('receiverName')}
+                      placeholder="Nome"
+                    />
+                  )}
+                </div>
+              )}
+
               <div className="mt-4">
-                <Button
-                  variant="outline"
-                  className="px-14 py-6"
-                  disabled={isSubmitting}
-                >
+                <Button variant="outline" className="px-14 py-6" disabled={isSubmitting}>
                   Salvar
                 </Button>
               </div>
@@ -205,30 +197,21 @@ export function OrderDetails({
         ) : (
           <div className="mb-8 flex flex-col gap-4">
             <div className="flex gap-4">
-              <div>
-                <p className="text-sm font-semibold">NOME</p>
-                <p className="text-sm text-muted-foreground">{user?.name}</p>
-              </div>
-
-              <div>
-                <p className="text-sm font-semibold">STATUS</p>
-                <p className="text-sm text-muted-foreground">{status}</p>
-              </div>
+              {renderContactInfo("NOME", user?.name)}
+              {renderContactInfo("STATUS", status)}
             </div>
             <div className="flex gap-6">
-              <div>
-                <p className="text-sm font-semibold">CONTATO</p>
-                <p className="text-sm text-muted-foreground">{user?.phone}</p>
-              </div>
-              <div>
-                <p className="text-sm font-semibold">E-MAIL</p>
-                <p className="text-sm text-muted-foreground">{user?.email}</p>
-              </div>
-              <div>
-                <p className="text-sm font-semibold">Criado</p>
-                <p className="text-sm text-muted-foreground">{date}</p>
-              </div>
+              {renderContactInfo("CONTATO", user?.phone)}
+              {renderContactInfo("E-MAIL", user?.email)}
+              {renderContactInfo("Criado", date)}
             </div>
+
+            {status === OrderStatus.delivered && (
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-semibold">RETIRADO POR:</p>
+                <p className="text-sm text-muted-foreground">{receiverName}</p>
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -25,7 +25,7 @@ type SignInSchema = z.infer<typeof signInSchema>
 export function SignIn() {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
-  const { signin } = useStore()
+  const { signin, loadCartForUser } = useStore()
 
   const {
     register,
@@ -47,7 +47,7 @@ export function SignIn() {
         toast.error(errorMessage)
         return
       }
-
+      loadCartForUser(email)
       navigate('/')
     } catch (err) {
       toast.error('Credenciais inválidas')

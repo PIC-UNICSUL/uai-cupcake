@@ -74,7 +74,7 @@ export function Profile() {
               <DialogTrigger asChild>
                 <Button className="px-8 md:px-10">Alterar</Button>
               </DialogTrigger>
-              <ProfileEdit />
+              <ProfileEdit name={user?.name!} email={user?.email!} phone={user?.phone!} />
             </Dialog>
           </div>
         </div>

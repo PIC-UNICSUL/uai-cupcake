@@ -10,7 +10,7 @@ export function CardProduct({ img, price, name }: CardProductProps) {
   return (
     <Card>
       <CardContent className="w-full p-0">
-        <img src={img} alt={name} className="p-0 h-64 w-64 rounded" />
+        <img src={img} alt={name} className="h-64 w-64 rounded p-0" />
         <p className="p-6 text-xl font-semibold">{name}</p>
       </CardContent>
       <CardFooter>

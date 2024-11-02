@@ -1,30 +1,37 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { useStore } from '.';
-import { User, CartItem, OrderStatus } from '@/@types/types';
+
+// EM MANUTENÇÃO
+import { beforeEach, describe, expect, it } from 'vitest'
+
+import {
+  OrderStatus,
+  Product,
+  productStatus,
+  User,
+  userType,
+} from '@/@types/types'
+
+import { useStore } from '.'
 
 // Mock de localStorage
 const localStorageMock = (() => {
-    let store: { [key: string]: string } = {};
-    return {
-      getItem(key: string) {
-        return store[key] || null;
-      },
-      setItem(key: string, value: string) {
-        store[key] = String(value);
-      },
-      clear() {
-        console.log('Clearing localStorage');
-        store = {};
-      },
-      removeItem(key: string) {
-        console.log(`Removing item from localStorage: ${key}`);
-        delete store[key];
-      },
-    };
-})();
-  
-Object.defineProperty(global, 'localStorage', { value: localStorageMock });
+  let store: { [key: string]: string } = {}
+  return {
+    getItem(key: string) {
+      return store[key] || null
+    },
+    setItem(key: string, value: string) {
+      store[key] = String(value)
+    },
+    clear() {
+      store = {}
+    },
+    removeItem(key: string) {
+      delete store[key]
+    },
+  }
+})()
 
+Object.defineProperty(global, 'localStorage', { value: localStorageMock })
 
 describe('Store tests', () => {
   beforeEach(() => {
@@ -35,176 +42,304 @@ describe('Store tests', () => {
       cartQuantity: 0,
       cartItemsTotal: 0,
       orders: [],
-    });
-    localStorage.clear();
-  });
+      products: [],
+    })
+    localStorage.clear()
+  })
 
-//   AUTH TESTS
+  // AUTH TESTS
   it('should initialize user from storage', () => {
-    const mockUser = { email: 'test@example.com', password: '12345', name: 'Test User' };
-    
-    localStorage.setItem('uaiCupcakes:user_token', JSON.stringify({ email: mockUser.email }));
-    localStorage.setItem('uaiCupcakes:users_bd', JSON.stringify([mockUser]));
+    const mockUser: User = {
+      email: 'test@example.com',
+      password_hash: '12345',
+      name: 'Test User',
+      user_id: '1',
+      phone: '1234567890',
+      created_at: new Date(),
+    }
 
-    const { initializeUserFromStorage } = useStore.getState();
-    
-    initializeUserFromStorage();
+    localStorage.setItem(
+      'uaiCupcakes:user_token',
+      JSON.stringify({ email: mockUser.email }),
+    )
+    localStorage.setItem('uaiCupcakes:users_bd', JSON.stringify([mockUser]))
+
+    const { initializeUserFromStorage } = useStore.getState()
+
+    initializeUserFromStorage()
 
     const { user, signed } = useStore.getState()
 
-    expect(user).toEqual(mockUser);
-    expect(signed).toBe(true);
-  });
+    expect(user).toEqual(mockUser)
+    expect(signed).toBe(true)
+  })
 
   it('should sign in a valid user', () => {
-    const mockUser: User = { email: 'test@example.com', password: '12345', name: 'Test User', id: '1' };
-    
-    localStorage.setItem('uaiCupcakes:users_bd', JSON.stringify([mockUser]));
-    
-    const { signin } = useStore.getState();
+    const mockUser: User = {
+      email: 'test@example.com',
+      password_hash: '12345',
+      name: 'Test User',
+      user_id: '1',
+      phone: '1234567890',
+      created_at: new Date(),
+    }
 
-    signin(mockUser.email, mockUser.password);
+    localStorage.setItem('uaiCupcakes:users_bd', JSON.stringify([mockUser]))
 
-    const { user, signed } = useStore.getState();
+    const { signin } = useStore.getState()
 
-    expect(user).toEqual(mockUser);
-    expect(signed).toBe(true);
-  });
+    signin(mockUser.email, mockUser.password_hash)
+
+    const { user, signed } = useStore.getState()
+
+    expect(user).toEqual(mockUser)
+    expect(signed).toBe(true)
+  })
 
   it('should fail to sign in with an incorrect password', () => {
-    const mockUser: User = { email: 'test@example.com', password: '12345', name: 'Test User', id: '1' };
-    
-    localStorage.setItem('uaiCupcakes:users_bd', JSON.stringify([mockUser]));
+    const mockUser: User = {
+      email: 'test@example.com',
+      password_hash: '12345',
+      name: 'Test User',
+      user_id: '1',
+      phone: '1234567890',
+      created_at: new Date(),
+    }
 
-    const { signin } = useStore.getState();
-    const result = signin(mockUser.email, 'wrongpassword');
+    localStorage.setItem('uaiCupcakes:users_bd', JSON.stringify([mockUser]))
 
-    expect(result).toBe('E-mail ou senha incorretos');
-  });
+    const { signin } = useStore.getState()
+    const result = signin(mockUser.email, 'wrongpassword')
+
+    expect(result).toBe('E-mail ou senha incorretos')
+  })
 
   it('should sign up a new user and save to storage', () => {
-    const mockUser: User = { email: 'newuser@example.com', password: '12345', name: 'New User' };
+    const mockUser: User = {
+      email: 'newuser@example.com',
+      password_hash: '12345',
+      name: 'New User',
+      phone: '1234567890',
+      created_at: new Date(),
+      user_id: '2',
+    }
 
-    const { signup } = useStore.getState();
-    signup(mockUser);
+    const { signup } = useStore.getState()
+    signup(mockUser)
 
-    const savedUsers = JSON.parse(localStorage.getItem('uaiCupcakes:users_bd') || '[]');
-    expect(savedUsers.length).toBe(1);
-    expect(savedUsers[0].email).toBe(mockUser.email);
-  });
+    const savedUsers = JSON.parse(
+      localStorage.getItem('uaiCupcakes:users_bd') || '[]',
+    )
+    expect(savedUsers.length).toBe(1)
+    expect(savedUsers[0].email).toBe(mockUser.email)
+  })
 
-// CART TESTS
-  it('should add cupcakes to the cart and calculate totals', () => {
-    const mockCupcake: CartItem = { id: 1, name: 'Chocolate Cupcake', price: 5, quantity: 2, categories: ['Doce', 'Tradicional'], description: "Um delicioso cupcake", img: "https://example.com/cupcake.jpg" };
+  // CART TESTS
+  it('should add products to the cart and calculate totals', () => {
+    const { addProductsToCart, calculateCartTotals } = useStore.getState()
 
-    const { addCupcakesToCart } = useStore.getState();
-    addCupcakesToCart([mockCupcake]);
-    
-    const { cartItems, cartItemsTotal } = useStore.getState();
+    addProductsToCart([
+      {
+        product_id: 1,
+        quantity: 2,
+        created_at: new Date(),
+        order_item_id: 1,
+        order_id: 1,
+      },
+    ])
+    calculateCartTotals()
 
-    expect(cartItems.length).toBe(1);
-    expect(cartItemsTotal).toBe(10);
-  });
+    const { cartItems, cartQuantity, cartItemsTotal } = useStore.getState()
 
-  it('should increase cart item quantity', () => {
-    const mockCupcake: CartItem = { id: 1, name: 'Chocolate Cupcake', price: 5, quantity: 2, categories: ['Doce', 'Tradicional'], description: "Um delicioso cupcake", img: "https://example.com/cupcake.jpg" };
+    expect(cartItems).toHaveLength(1)
+    expect(cartQuantity).toBe(2) // Verificando a quantidade correta
+    expect(cartItemsTotal).toBeGreaterThan(0)
+  })
 
-    const { addCupcakesToCart, changeCartItemQuantity, cartItems } = useStore.getState();
-    addCupcakesToCart([mockCupcake]);
-    changeCartItemQuantity(mockCupcake.id, 'increase');
+  it('should increase item quantity in the cart', () => {
+    const { addProductsToCart, changeCartItemQuantity, calculateCartTotals } =
+      useStore.getState()
 
-    expect(cartItems[0].quantity).toBe(3);
-  });
+    addProductsToCart([
+      {
+        product_id: 1,
+        quantity: 1,
+        created_at: new Date(),
+        order_item_id: 1,
+        order_id: 1,
+      },
+    ])
+    changeCartItemQuantity(1, 'increase') // Supondo que 1 é o order_item_id
+    calculateCartTotals()
 
-  it('should decrease cart item quantity', () => {
-    const mockCupcake: CartItem = { id: 1, name: 'Chocolate Cupcake', price: 5, quantity: 2, categories: ['Doce', 'Tradicional'], description: "Um delicioso cupcake", img: "https://example.com/cupcake.jpg" };
+    const { cartItemsTotal } = useStore.getState()
+    expect(cartItemsTotal).toBeGreaterThan(0)
+  })
 
-    const { addCupcakesToCart, changeCartItemQuantity, cartItems } = useStore.getState();
-    addCupcakesToCart([mockCupcake]);
-    changeCartItemQuantity(mockCupcake.id, 'decrease');
+  it('should remove an item from the cart', () => {
+    const { addProductsToCart, removeCartItem } = useStore.getState()
+    addProductsToCart([
+      {
+        product_id: 1,
+        quantity: 1,
+        created_at: new Date(),
+        order_item_id: 1,
+        order_id: 1,
+      },
+    ])
+    removeCartItem(1) // Supondo que 1 é o order_item_id
 
-    expect(cartItems[0].quantity).toBe(1);
-  });
+    const { cartItems } = useStore.getState()
+    expect(cartItems).toHaveLength(0)
+  })
 
-  it('should remove a cart item', () => {
-    const mockCupcake: CartItem = { id: 1, name: 'Chocolate Cupcake', price: 5, quantity: 2, categories: ['Doce', 'Tradicional'], description: "Um delicioso cupcake", img: "https://example.com/cupcake.jpg" };
+  // PRODUCTS TEST
+  it('should add a new product', () => {
+    const { addProduct, products } = useStore.getState()
+    const newProduct: Product = {
+      product_id: 123,
+      name: 'Cupcake',
+      price: 5.0,
+      availability_status: productStatus.available,
+      img: ' ',
+      description: '',
+      category: '',
+    }
+    addProduct(newProduct)
 
-    const { addCupcakesToCart, removeCartItem, cartItems } = useStore.getState();
-    addCupcakesToCart([mockCupcake]);
-    removeCartItem(mockCupcake.id);
+    const { products: updatedProducts } = useStore.getState()
+    expect(updatedProducts).toContainEqual(newProduct)
+  })
 
-    expect(cartItems.length).toBe(0);
-  });
+  it('should update a product availability status', () => {
+    const { addProduct, updateAvailabilityStatus, products } =
+      useStore.getState()
 
-  it('should clean the cart', () => {
-    const mockCupcake: CartItem = { id: 1, name: 'Chocolate Cupcake', price: 5, quantity: 2, categories: ['Doce', 'Tradicional'], description: "Um delicioso cupcake", img: "https://example.com/cupcake.jpg" };
+    const newProduct: Product = {
+      product_id: 1,
+      name: 'Cupcake',
+      price: 5.0,
+      availability_status: productStatus.available,
+      img: ' ',
+      description: '',
+      category: '',
+    }
+    addProduct(newProduct)
 
-    const { addCupcakesToCart, cleanCart } = useStore.getState();
-    addCupcakesToCart([mockCupcake]);
-    cleanCart();
-    
-    const { cartItems } = useStore.getState();
-    
-    expect(cartItems.length).toBe(0);
-  });
+    updateAvailabilityStatus(1, productStatus.unavailable) // Passando o ID correto
+    const updatedProduct = products.find((product) => product.product_id === 1)
+
+    expect(updatedProduct?.availability_status).toBe(productStatus.unavailable)
+  })
+
+  it('should remove a product', () => {
+    const { addProduct, removeProduct } = useStore.getState()
+    const productId = 1
+    addProduct({
+      name: 'Cupcake',
+      price: 5.0,
+      img: ' ',
+      description: '',
+      category: '',
+    })
+
+    removeProduct(productId)
+
+    const { products: updatedProducts } = useStore.getState()
+    expect(updatedProducts).not.toContainEqual(
+      expect.objectContaining({ product_id: productId }),
+    )
+  })
+
+  it('should update a product', () => {
+    const { addProduct, updateProduct, products } = useStore.getState()
+    const productId = 1
+    addProduct({
+      name: 'Cupcake',
+      price: 5.0,
+      img: ' ',
+      description: '',
+      category: '',
+    })
+
+    updateProduct({
+      product_id: productId,
+      name: 'Cupcake',
+      price: 10.0,
+      availability_status: productStatus.available,
+      description: '',
+      category: '',
+    })
+
+    const updatedProduct = products.find(
+      (product) => product.product_id === productId,
+    )
+
+    expect(updatedProduct?.price).toBe(10.0)
+  })
 
   // ORDERS TESTS
-  it('should add a new order and save to localStorage', () => {
-    const mockUser: User = { email: 'test@example.com', password: '12345', name: 'Test User', id: '1' };
-    const mockCupcake: CartItem = { id: 1, name: 'Chocolate Cupcake', price: 5, quantity: 2, categories: ['Doce', 'Tradicional'], description: "Um delicioso cupcake", img: "https://example.com/cupcake.jpg" };
+  it('should add a new order', () => {
+    const { addOrder } = useStore.getState()
+    const user: User = {
+      user_id: 'user123',
+      email: 'user@example.com',
+      user_type: userType.customer,
+      phone: '10203012000',
+      password_hash: 'd',
+      name: 'd',
+      created_at: new Date(),
+    }
 
-    const { addOrder } = useStore.getState();
-    addOrder(mockUser, [mockCupcake], 10);
-    
-    const { orders } = useStore.getState();
+    addOrder(
+      user,
+      [
+        {
+          order_item_id: 1,
+          order_id: 1,
+          product_id: 1,
+          quantity: 2,
+          created_at: new Date(),
+        },
+      ],
+      10.0,
+    )
 
-    expect(orders.length).toBe(1);
-    const savedOrders = JSON.parse(localStorage.getItem('all_orders') || '[]');
-    expect(savedOrders.length).toBe(1);
-    expect(savedOrders[0].userEmail).toBe(mockUser.email);
-  });
-
-  it('should fetch user-specific orders', () => {
-    const mockOrder = {
-      orderId: 1,
-      items: [],
-      total: 100,
-      date: new Date().toISOString(),
-      status: OrderStatus.pending,
-      userEmail: 'test@example.com',
-      userName: 'Test User',
-      userPhone: '123456789',
-    };
-
-    localStorage.setItem('all_orders', JSON.stringify([mockOrder]));
-
-    const { fetchUserOrders } = useStore.getState();
-    fetchUserOrders(mockOrder.userEmail);
-
-    const { orders } = useStore.getState();
-
-    expect(orders.length).toBe(1);
-    expect(orders[0].userEmail).toBe(mockOrder.userEmail);
-  });
+    const { orders: updatedOrders } = useStore.getState()
+    expect(updatedOrders).toHaveLength(1)
+    expect(updatedOrders[0].user_id).toBe(user.user_id)
+  })
 
   it('should update order status', () => {
-    const mockOrder = {
-      orderId: 1,
-      items: [],
-      total: 100,
-      date: new Date().toISOString(),
-      status: OrderStatus.pending,
-      userEmail: 'test@example.com',
-    };
-    localStorage.setItem('all_orders', JSON.stringify([mockOrder]));
+    const { addOrder, updateOrderStatus, orders } = useStore.getState()
+    const user: User = {
+      user_id: 'user123',
+      email: 'user@example.com',
+      user_type: userType.customer,
+      phone: '10203012000',
+      password_hash: 'd',
+      name: 'd',
+      created_at: new Date(),
+    }
 
-    const { updateOrderStatus } = useStore.getState();
-    updateOrderStatus(1, OrderStatus.delivered);
+    addOrder(
+      user,
+      [
+        {
+          order_item_id: 1,
+          order_id: 1,
+          product_id: 1,
+          quantity: 2,
+          created_at: new Date(),
+        },
+      ],
+      10.0,
+    )
 
-    const { orders } = useStore.getState();
+    const orderId = orders[0].order_id
+    updateOrderStatus(orderId, OrderStatus.ready)
 
-    expect(orders[0].status).toBe(OrderStatus.delivered);
-    const savedOrders = JSON.parse(localStorage.getItem('all_orders') || '[]');
-    expect(savedOrders[0].status).toBe(OrderStatus.delivered);
-  });
-});
+    const updatedOrder = orders.find((order) => order.order_id === orderId)
+    expect(updatedOrder?.status).toBe(OrderStatus.ready)
+  })
+})

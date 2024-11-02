@@ -1,6 +1,7 @@
 import { Helmet } from 'react-helmet-async'
 import { useNavigate } from 'react-router-dom'
 
+import { OrderItems, Product } from '@/@types/types'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
@@ -9,8 +10,12 @@ import { useStore } from '@/store'
 import { formatMoney } from '../products/components/product-details'
 import { ProductsCheckout } from './components/products-checkout'
 
+type CartItemWithProductInfo = OrderItems &
+  Pick<Product, 'name' | 'description' | 'img' | 'price'>
+
 export function Checkout() {
-  const { cartItems, cartItemsTotal, cleanCart, addOrder, user } = useStore()
+  const { cartItems, cartItemsTotal, cleanCart, addOrder, user, products } =
+    useStore()
 
   const formattedItemsTotal = formatMoney(cartItemsTotal)
 
@@ -25,6 +30,22 @@ export function Checkout() {
       navigate('/orders')
     }
   }
+
+  const cartItemsWithProductInfo: CartItemWithProductInfo[] = cartItems.map(
+    (item) => {
+      const product = products.find(
+        (cupcake) => cupcake.product_id === item.product_id,
+      )
+
+      return {
+        ...item,
+        name: product?.name ?? '',
+        description: product?.description ?? '',
+        img: product?.img ?? '',
+        price: product?.price ?? 0,
+      }
+    },
+  )
 
   return (
     <div>
@@ -57,8 +78,8 @@ export function Checkout() {
               <span className="mb-4 text-2xl">Revise seu pedido</span>
               <ScrollArea className="h-80 w-full">
                 <div className=" flex flex-col gap-4">
-                  {cartItems.map((item) => (
-                    <ProductsCheckout key={item.id} cupcake={item} />
+                  {cartItemsWithProductInfo.map((item) => (
+                    <ProductsCheckout key={item.order_item_id} cupcake={item} />
                   ))}
                 </div>
               </ScrollArea>

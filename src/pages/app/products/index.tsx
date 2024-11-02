@@ -1,26 +1,25 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
+import { v4 as uuidv4 } from 'uuid'
 
 import { SelectMenu } from '@/components/menus'
 import { QuantityInput } from '@/components/quantity-input'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { SelectItem } from '@/components/ui/select'
 import { useStore } from '@/store'
-import { Cupcakes } from '@/mock/Cupcakes'
 
-import { ProductDetails } from './components/product-details'
-import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import { NewProduct } from './components/new-product'
-import { Cupcake } from '@/@types/types'
+import { ProductDetails } from './components/product-details'
 
 export function Products() {
-  const [cupcakes, setCupcakes] = useState<Cupcake[]>([])
   const [quantities, setQuantities] = useState<{ [key: number]: number }>({})
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
-  const { signed, user, addCupcakesToCart } = useStore()
+  const { signed, user, addProductsToCart, products } = useStore()
 
   function handleIncrease(id: number) {
     setQuantities((prevState) => ({
@@ -36,55 +35,44 @@ export function Products() {
     }))
   }
 
-  if (cupcakes.length === 0) {
-    setCupcakes(Cupcakes)
-  }
-
   function handleAddToCart() {
-    const cupcakesToAdd = cupcakes
-      .filter((cupcake) => (quantities[cupcake.id] || 0) > 0)
+    const cupcakesToAdd = products
+      .filter((cupcake) => (quantities[cupcake.product_id] || 0) > 0)
       .map((cupcake) => ({
-        ...cupcake,
-        quantity: quantities[cupcake.id],
+        order_item_id: parseInt(uuidv4(), 16),
+        order_id: parseInt(uuidv4(), 16),
+        product_id: cupcake.product_id,
+        quantity: quantities[cupcake.product_id],
+        created_at: new Date(),
       }))
 
     if (cupcakesToAdd.length > 0) {
-      addCupcakesToCart(cupcakesToAdd)
+      addProductsToCart(cupcakesToAdd, user?.email!)
+      toast.success('Cupcakes adicionados ao carrinho')
     }
-    toast.success('Cupcakes adicionados ao carrinho')
-  }
-
-  function handleDelete(id: number) {
-    setCupcakes((prevCupcakes) => prevCupcakes.filter((cupcake) => cupcake.id !== id))
-    toast.success('Produto excluído com sucesso')
   }
 
   return (
     <div className="flex min-h-screen flex-col gap-6">
-      <div className="w-1/3">
-        <p className="text-semibold text-4xl">Todos</p>
-        <p className="text-muted-foreground">
+      <div className="w-full md:w-1/3">
+        <p className="text-semibold text-xl lg:text-4xl">Todos</p>
+        <p className="text-muted-foreground text-sm md:text-base">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
           eiusmod tempor incididunt ut labore et dolore magna aliqua.
         </p>
       </div>
+
       <div className="grid w-full md:grid-cols-[220px_1fr] lg:grid-cols-[450px_1fr]">
         <div>
           <div className="flex items-center gap-4 pb-5">
-            <p className="font-semibold">Filtros</p>
-            <Button variant="link" className="h-1 text-muted-foreground">
+            <p className="font-semibold text-sm md:text-base">Filtros</p>
+            <Button variant="link" className="h-1 text-sm md:text-base text-muted-foreground">
               Limpar filtros
             </Button>
           </div>
           <div>
             <p className="pb-4 text-xs font-bold">Categorias</p>
             <div className="flex flex-col gap-1">
-              <div className="flex items-center space-x-2">
-                <Checkbox id="limitada" />
-                <Label htmlFor="limitada" className="text-sm font-medium">
-                  Edição limitada
-                </Label>
-              </div>
               <div className="flex items-center space-x-2">
                 <Checkbox id="vegano" />
                 <Label htmlFor="vegano" className="text-sm font-medium">
@@ -109,23 +97,24 @@ export function Products() {
                   Salgado
                 </Label>
               </div>
-              {user?.admin && (
-                <div className='mt-2'>
-                  <Dialog>
+              {user?.user_type === 'admin' && (
+                <div className="mt-2">
+                  <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                     <DialogTrigger asChild>
                       <Button>Adicionar novo cupcake</Button>
                     </DialogTrigger>
-                    <NewProduct />
+                    <NewProduct onClose={() => setIsModalOpen(false)} />
                   </Dialog>
                 </div>
               )}
             </div>
           </div>
         </div>
-        {cupcakes.length > 0 ? (
-          <div className="flex w-full flex-col items-center">
-            <div className="flex flex-col items-end pb-11">
-              <div className="flex flex-col items-center">
+
+        {products.length > 0 ? (
+          <div className="flex w-full flex-col">
+            <div className="pb-11">
+              <div className="flex flex-col items-end">
                 <SelectMenu
                   defaultValue="popular"
                   size="large"
@@ -139,42 +128,48 @@ export function Products() {
                   <SelectItem value="item5">Item5</SelectItem>
                 </SelectMenu>
                 <p className="text-sm">
-                  {cupcakes.length} produtos encontrados
+                  {products.length} produtos encontrados
                 </p>
               </div>
-              <div>
-                <div className="flex flex-col items-center gap-4">
-                  <div>
-                    {cupcakes.map((cupcake) => {
+              <div className="w-full">
+                <div className="flex flex-col gap-4 sm:items-end">
+                  <div className="w-full md:w-4/5">
+                    {products.map((cupcake) => {
                       return (
                         <ProductDetails
-                          key={cupcake.id}
+                          key={cupcake.product_id}
                           cupcake={cupcake}
                           quantityInput={
                             <QuantityInput
-                              quantity={quantities[cupcake.id] || 0}
-                              onIncrease={() => handleIncrease(cupcake.id)}
-                              onDecrease={() => handleDecrease(cupcake.id)}
+                              quantity={quantities[cupcake.product_id] || 0}
+                              onIncrease={() =>
+                                handleIncrease(cupcake.product_id)
+                              }
+                              onDecrease={() =>
+                                handleDecrease(cupcake.product_id)
+                              }
                             />
                           }
-                          handleDelete={user?.admin ? handleDelete : undefined}
                         />
                       )
                     })}
                   </div>
                   {signed ? (
-                    <Button
-                      className="w-3/6 text-center transition disabled:cursor-default disabled:opacity-40"
-                      disabled={
-                        cupcakes.filter(
-                          (cupcake) => (quantities[cupcake.id] || 0) > 0,
-                        ).length == 0
-                      }
-                      variant="outline"
-                      onClick={handleAddToCart}
-                    >
-                      Adicionar ao carrinho
-                    </Button>
+                    <div className="w-full text-center">
+                      <Button
+                        className="w-3/6 transition disabled:cursor-default disabled:opacity-40"
+                        disabled={
+                          products.filter(
+                            (cupcake) =>
+                              (quantities[cupcake.product_id] || 0) > 0,
+                          ).length == 0
+                        }
+                        variant="outline"
+                        onClick={handleAddToCart}
+                      >
+                        Adicionar ao carrinho
+                      </Button>
+                    </div>
                   ) : (
                     <Link
                       to="/sign-in"

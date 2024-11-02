@@ -1,6 +1,5 @@
 import { createBrowserRouter } from 'react-router-dom'
 
-import { RequireAuth } from './pages/auth/RequireAuth'
 import { AppLayout } from './pages/_layouts/app'
 import { AuthLayout } from './pages/_layouts/auth'
 import { NotFound } from './pages/404'
@@ -12,6 +11,7 @@ import { Products } from './pages/app/products'
 import { Profile } from './pages/app/profile'
 import { ForgetPassword } from './pages/auth/forget-password'
 import { NewPassword } from './pages/auth/new-password'
+import { RequireAuth } from './pages/auth/RequireAuth'
 import { SignIn } from './pages/auth/sign-in'
 import { SignUp } from './pages/auth/sign-up'
 
