@@ -23,22 +23,24 @@ export function AccountMenu() {
         <Button
           variant="outline"
           size="custom"
-          className="flex select-none p-2 text-xs sm:text-sm items-center gap-2"
+          className="flex select-none items-center gap-2 p-2 text-xs sm:text-sm"
         >
           Meu perfil
           <ChevronDown className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel className="flex flex-col w-full">
-          <span className="overflow-hidden text-ellipsis whitespace-nowrap">{user?.name}</span>
-          <span className="text-xs font-normal text-ellipsis overflow-hidden whitespace-nowrap text-muted-foreground">
+        <DropdownMenuLabel className="flex w-full flex-col">
+          <span className="overflow-hidden text-ellipsis whitespace-nowrap">
+            {user?.name}
+          </span>
+          <span className="overflow-hidden text-ellipsis whitespace-nowrap text-xs font-normal text-muted-foreground">
             {user?.email}
           </span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
-          <Link to="/orders" className="flex gap-2 items-center">
+          <Link to="/orders" className="flex items-center gap-2">
             <List className="h-4 w-4" />
             <span>Meus pedidos</span>
           </Link>

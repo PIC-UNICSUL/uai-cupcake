@@ -1,3 +1,4 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import InputMask from 'react-input-mask-next'
 import { toast } from 'sonner'
@@ -13,33 +14,62 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useStore } from '@/store'
 
+interface ProfileEditProps {
+  name: string
+  email: string
+  phone: string
+}
+
 const profileEditSchema = z.object({
-  email: z.string().email(),
-  name: z.string().min(2),
-  phone: z.string().min(8),
+  email: z.string().email('Informe um e-mail válido'),
+  name: z
+    .string({
+      required_error: 'Informe seu nome',
+      invalid_type_error: 'Informe um nome',
+    })
+    .min(3, 'No mínimo 3 caracteres')
+    .regex(/^[A-Za-z\s]+$/, 'O nome não pode conter números'),
+  phone: z
+    .string()
+    .min(14, 'Informe um número válido')
+    .regex(
+      /^\(\d{2}\) \d{5}-\d{4}$/,
+      'Informe um número válido no formato (99) 99999-9999',
+    ),
 })
 
 type ProfileEditSchema = z.infer<typeof profileEditSchema>
 
-export function ProfileEdit() {
+export function ProfileEdit({ name, email, phone }: ProfileEditProps) {
   const {
     register,
     handleSubmit,
-    formState: { isSubmitting },
-  } = useForm<ProfileEditSchema>()
+    formState: { isSubmitting, errors },
+  } = useForm<ProfileEditSchema>({
+    resolver: zodResolver(profileEditSchema),
+    defaultValues: {
+      name,
+      email,
+      phone,
+    },
+    mode: 'onBlur', // valida o formulário ao sair de um campo
+    criteriaMode: 'all', // valida o formulário em todos os campos ao clicar em submit
+  })
 
   const { updateUser } = useStore()
 
   async function handleProfileEdit(data: ProfileEditSchema) {
     try {
       await new Promise((resolve) => setTimeout(resolve, 2000))
-      updateUser(data)
-      toast.success('Alteração feita com sucesso!', {
-        action: {
-          label: 'Alteração feita',
-          onClick: () => { },
-        },
-      })
+
+      const errorMessage = updateUser(data)
+
+      if (typeof errorMessage === 'string') {
+        toast.error(errorMessage)
+        return
+      }
+
+      toast.success('Alteração feita com sucesso!')
     } catch (error) {
       toast.error('Erro ao fazer alterações')
     }
@@ -58,6 +88,9 @@ export function ProfileEdit() {
             placeholder="Maria Lopes"
             {...register('name')}
           />
+          {errors.name && (
+            <span className="text-sm text-red-500">{errors.name.message}</span>
+          )}
         </div>
         <div className="grid gap-2">
           <Label htmlFor="email">E-mail</Label>
@@ -67,6 +100,9 @@ export function ProfileEdit() {
             placeholder="email@email.com"
             {...register('email')}
           />
+          {errors.email && (
+            <span className="text-sm text-red-500">{errors.email.message}</span>
+          )}
         </div>
         <div className="grid gap-2">
           <Label htmlFor="phone">Celular</Label>
@@ -77,6 +113,9 @@ export function ProfileEdit() {
             placeholder="Digite seu celular"
             {...register('phone')}
           />
+          {errors.phone && (
+            <span className="text-sm text-red-500">{errors.phone.message}</span>
+          )}
         </div>
         <div className="flex w-full justify-center sm:block">
           <Button

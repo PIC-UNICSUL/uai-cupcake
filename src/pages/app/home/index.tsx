@@ -3,12 +3,15 @@ import { Link } from 'react-router-dom'
 
 import { Header } from '@/components/header'
 import { Button } from '@/components/ui/button'
-
-import { CardProduct } from './components/card'
 import { Cupcakes } from '@/mock/Cupcakes'
+import { useStore } from '@/store'
+
 import { formatMoney } from '../products/components/product-details'
+import { CardProduct } from './components/card'
 
 export function Home() {
+  const { products } = useStore()
+
   return (
     <>
       <Helmet title="Home" />
@@ -35,16 +38,18 @@ export function Home() {
               </Link>
             </div>
 
-            <div className="flex w-full justify-center space-x-4 pb-12 pt-6">
-              {Cupcakes.slice(1, 4).map((cupcake) => (
-                <CardProduct
-                  key={cupcake.id}
-                  img={cupcake.img}
-                  name={cupcake.name}
-                  price={formatMoney(cupcake.price)}
-                />
-              ))}
-            </div>
+            {products.length > 0 && (
+              <div className="flex w-full justify-center space-x-4 pb-12 pt-6">
+                {Cupcakes.slice(1, 4).map((cupcake) => (
+                  <CardProduct
+                    key={cupcake.product_id}
+                    img={cupcake.img}
+                    name={cupcake.name}
+                    price={formatMoney(cupcake.price)}
+                  />
+                ))}
+              </div>
+            )}
 
             <div className="">
               <p className="px-4 pb-1 text-2xl font-bold sm:text-3xl md:pb-6 md:text-4xl">

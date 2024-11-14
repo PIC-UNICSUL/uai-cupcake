@@ -16,7 +16,7 @@ const signUpFormSchema = z.object({
     .string()
     .nonempty('Por favor, preencha o campo nome')
     .min(1, 'Nome tem que ter mais de um caracter'),
-  password: z
+  password_hash: z
     .string()
     .nonempty('Por favor, preencha o campo senha')
     .min(8, 'Senha tem que ter no mínimo 8 caracteres'),
@@ -65,7 +65,7 @@ export function SignUp() {
   return (
     <>
       <Helmet title="Sign Up" />
-      <div className="p-8">
+      <div className="py-8 px-2 lg:px-0">
         <div className="flex max-w-80 flex-col justify-center gap-6">
           <div className="flex flex-col gap-2 text-center">
             <h1 className="text-2xl font-semibold tracking-tight">
@@ -104,7 +104,6 @@ export function SignUp() {
 
             <div className="space-y-1">
               <Label htmlFor="phone">Celular</Label>
-
               <InputMask
                 id="phone"
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
@@ -118,15 +117,15 @@ export function SignUp() {
             </div>
 
             <div className="space-y-1">
-              <Label htmlFor="password">Senha</Label>
+              <Label htmlFor="password_hash">Senha</Label>
               <Input
-                id="password"
+                id="password_hash"
                 type="password"
-                {...register('password')}
+                {...register('password_hash')}
                 placeholder="Digite sua senha"
               />
-              {errors.password && (
-                <p className="text-red-500">{errors.password.message}</p>
+              {errors.password_hash && (
+                <p className="text-red-500">{errors.password_hash.message}</p>
               )}
             </div>
 

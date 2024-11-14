@@ -1,12 +1,13 @@
 import { format, formatDistanceToNow, isValid, parseISO } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 
-export function formatOrderDate(orderDate: string) {
-  let orderDateObj = new Date(orderDate)
+export function formatOrderDate(orderDate: Date) {
+  const newDateString = orderDate.toString()
+  let orderDateObj = new Date(newDateString)
   const now = new Date()
 
   if (!isValid(orderDateObj)) {
-    orderDateObj = parseISO(orderDate)
+    orderDateObj = parseISO(newDateString)
   }
 
   if (!isValid(orderDateObj)) {

@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 
-import { useStore } from '@/store'
 import { formatMoney } from '@/pages/app/products/components/product-details'
+import { useStore } from '@/store'
 
 import { CardCart } from './cardcart'
 import { Button } from './ui/button'
@@ -19,23 +19,23 @@ export function Cart() {
   const formattedItemsTotal = formatMoney(cartItemsTotal)
 
   return (
-    <SheetContent className="flex flex-col w-[400px] justify-between">
+    <SheetContent className="flex w-[400px] flex-col justify-between">
       <SheetHeader>
         <SheetTitle>Carrinho de compras</SheetTitle>
         <SheetDescription>
-          {cartQuantity == 0
+          {cartItems.length == 0
             ? 'Nenhum cupcake selecionado'
             : 'Cupcakes selecionados'}
         </SheetDescription>
       </SheetHeader>
       <ScrollArea className="h-2/3 w-full">
-        <div className="flex w-[96%] flex-col gap-4">
+        <div className="flex w-[96%] flex-col gap-2">
           {cartItems.map((item) => (
-            <CardCart key={item.id} cupcake={item} />
+            <CardCart key={item.order_item_id} cartItem={item} />
           ))}
         </div>
       </ScrollArea>
-      {cartQuantity > 0 ? (
+      {cartItems.length > 0 ? (
         <div className="flex flex-col justify-center gap-3">
           <div className="flex flex-col gap-4">
             <div className="flex justify-between">

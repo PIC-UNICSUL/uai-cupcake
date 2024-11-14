@@ -1,5 +1,6 @@
+import { useEffect, useState } from 'react'
 import { Helmet } from 'react-helmet-async'
-import { useStore } from '@/store'
+
 import { SelectMenu } from '@/components/menus'
 import { NavLink } from '@/components/nav-link'
 import { Pagination } from '@/components/pagination'
@@ -12,52 +13,50 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { useStore } from '@/store'
+
 import { OrderTableRow } from './components/order-table-row'
-import { useEffect, useState } from 'react'
+import { OrderTableFilter } from './components/order-table-filter'
 
 export function Orders() {
-  const { user, orders, fetchAllOrders } = useStore()
+  const {
+    user,
+    orders,
+    fetchAllOrders,
+    fetchUserOrders,
+  } = useStore()
 
   const [pageIndex, setPageIndex] = useState(0)
   const itemsPerPage = 6
 
   const paginatedOrders = orders.slice(
     pageIndex * itemsPerPage,
-    (pageIndex + 1) * itemsPerPage
+    (pageIndex + 1) * itemsPerPage,
   )
 
   useEffect(() => {
-    if (user?.admin) {
-      fetchAllOrders();
+    if (user) {
+      if (user.user_type === 'admin') {
+        fetchAllOrders()
+      } else {
+        fetchUserOrders(user.email)
+      }
     }
-  }, [user]);
+  }, [user, fetchUserOrders, fetchAllOrders])
 
   return (
     <>
       <Helmet title="Pedidos" />
-      {user?.admin ? (
+      {user?.user_type === 'admin' ? (
         <div>
-          <h1 className="text-xl font-semibold sm:text-2xl md:text-4xl">Pedidos</h1>
+          <h1 className="text-xl font-semibold sm:text-2xl md:text-4xl">
+            Pedidos
+          </h1>
           <div>
             {orders.length > 0 ? (
               <div>
-                <div className="flex gap-2 w-full justify-end">
-                  <div className="flex justify-end pb-2 md:pb-5 md:pt-7">
-                    <SelectMenu defaultValue="mounth" size="medium">
-                      <SelectItem value="mounth">Último mês</SelectItem>
-                      <SelectItem value="weak">Última semana</SelectItem>
-                      <SelectItem value="year">Último ano</SelectItem>
-                    </SelectMenu>
-                  </div>
-                  <div className="flex justify-end pb-2 md:pb-5 md:pt-7">
-                    <SelectMenu defaultValue="pending" size="medium">
-                      <SelectItem value="pending">Pendente</SelectItem>
-                      <SelectItem value="ready">Pronto</SelectItem>
-                      <SelectItem value="preparation">Em preparo</SelectItem>
-                      <SelectItem value="cancelled">Cancelado</SelectItem>
-                    </SelectMenu>
-                  </div>
-                </div>
+                <OrderTableFilter />
+    
                 <div>
                   <div className="rounded-md border">
                     <Table>
@@ -74,7 +73,7 @@ export function Orders() {
                       </TableHeader>
                       <TableBody>
                         {paginatedOrders.map((order) => (
-                          <OrderTableRow key={order.orderId} order={order} />
+                          <OrderTableRow key={order.order_id} order={order} />
                         ))}
                       </TableBody>
                     </Table>
@@ -89,7 +88,9 @@ export function Orders() {
               </div>
             ) : (
               <div className="flex h-[calc(100vh-80%)] items-center justify-center">
-                <p className="text-2xl font-semibold">Nenhum pedido encontrado</p>
+                <p className="text-2xl font-semibold">
+                  Nenhum pedido encontrado
+                </p>
               </div>
             )}
           </div>
@@ -136,7 +137,10 @@ export function Orders() {
                     </TableHeader>
                     <TableBody>
                       {paginatedOrders.map((order) => (
-                        <OrderTableRow key={order.orderId} order={order} />
+                        <OrderTableRow 
+                          key={order.order_id} 
+                          order={order}
+                        />
                       ))}
                     </TableBody>
                   </Table>

@@ -1,118 +1,96 @@
-import { Search } from 'lucide-react'
+import { Search } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 
-import { Button } from '@/components/ui/button'
-import { Dialog, DialogTrigger } from '@/components/ui/dialog'
-import { TableCell, TableRow } from '@/components/ui/table'
-import { Order } from '@/@types/types'
-import { formatOrderDate } from '@/utils/date-utils'
-
-import { OrderDetails } from './order-details'
-import { formatMoney } from '../../products/components/product-details'
-import { useStore } from '@/store'
+import { Order, OrderItems } from '@/@types/types';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogTrigger } from '@/components/ui/dialog';
+import { TableCell, TableRow } from '@/components/ui/table';
+import { useStore } from '@/store';
+import { formatOrderDate } from '@/utils/date-utils';
+import { formatMoney } from '../../products/components/product-details';
+import { OrderDetails } from './order-details';
 
 interface OrderTableRowProps {
-  order: Order
+  order: Order;
+}
+
+interface UserProps {
+  email: string;
+  name: string;
+  phone: string;
 }
 
 export function OrderTableRow({ order }: OrderTableRowProps) {
-  const { user } = useStore()
-  const formattedPrice = formatMoney(order.total)
+  const [orderItems, setOrderItems] = useState<OrderItems[]>([]);
+  const [buyer, setBuyer] = useState<UserProps | null>(null);
 
-  function color() {
-    switch (order.status) {
-      case 'Pendente':
-        return 'bg-slate-400'
-      case 'Preparando':
-        return 'bg-yellow-400'
-      case 'Pronto':
-        return 'bg-green-400'
-      case 'Cancelado':
-        return 'bg-red-400'
-      default:
-        return 'hidden'
+  const { user, fetchUsers, fetchAllOrderItems } = useStore();
+
+  const formattedPrice = useMemo(() => formatMoney(order.price), [order.price]);
+  const statusColor = useMemo(() => getStatusColor(order.status), [order.status]);
+
+  useEffect(() => {
+    const items = fetchAllOrderItems(order.order_id);
+    const userDetails = fetchUsers().find((u) => u.user_id === order.user_id) || null;
+
+    setBuyer(userDetails ? { email: userDetails.email, name: userDetails.name, phone: userDetails.phone } : null);
+    setOrderItems(items);
+  }, [order.order_id, fetchUsers]);
+
+  const totalQuantity = useMemo(() => orderItems.reduce((sum, item) => sum + item.quantity, 0), [orderItems]);
+
+  const renderBuyerDetails = () => {
+    if (user?.user_type === 'admin') {
+      return (
+        <TableCell className="font-medium">{buyer?.email}</TableCell>
+      );
     }
-  }
-
-  const status = color()
+    return null;
+  };
 
   return (
-    <>
-      {user?.admin ? (
-        <TableRow className="cursor-pointer">
-          <TableCell className="font-mono text-xs font-medium">
-            {order.orderId}
-          </TableCell>
-          <TableCell className="font-medium">{order.userEmail}</TableCell>
-          <TableCell className="font-medium">{order.items.length}</TableCell>
-          <TableCell className="font-medium">{formattedPrice}</TableCell>
-          <TableCell className="text-muted-foreground">
-            {formatOrderDate(order.date)}
-          </TableCell>
-          <TableCell>
-            <div className="flex items-center gap-1">
-              <span className={`h-2 w-2 rounded-full ${status}`}></span>
-              <span className="font-medium text-muted-foreground">
-                {order.status}
-              </span>
-            </div>
-          </TableCell>
-          <TableCell>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <Search className="h-5 w-4" />
-                </Button>
-              </DialogTrigger>
-              <OrderDetails
-                order={order.items}
-                id={order.orderId}
-                total={order.total}
-                date={formatOrderDate(order.date)}
-                status={order.status}
-                buyerEmail={order.userEmail}
-                buyerName={order.userName}
-                buyerPhone={order.userPhone}
-              />
-            </Dialog>
-          </TableCell>
-        </TableRow>
+    <TableRow className="cursor-pointer">
+      <TableCell className="font-mono text-xs font-medium">{order.order_id}</TableCell>
+      {renderBuyerDetails()}
+      <TableCell className="font-medium">{totalQuantity}</TableCell>
+      <TableCell className="font-medium">{formattedPrice}</TableCell>
+      <TableCell className="text-muted-foreground">{formatOrderDate(order.created_at)}</TableCell>
+      <TableCell>
+        <div className="flex items-center gap-1">
+          <span className={`h-2 w-2 rounded-full ${statusColor}`} aria-hidden="true"></span>
+          <span className="font-medium text-muted-foreground">{order.status}</span>
+        </div>
+      </TableCell>
+      <TableCell>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline" size="sm">
+              <Search className="h-5 w-4" />
+            </Button>
+          </DialogTrigger>
+          <OrderDetails
+            order={orderItems}
+            id={order.order_id}
+            total={formattedPrice}
+            date={formatOrderDate(order.created_at)}
+            status={order.status}
+            buyerEmail={buyer?.email}
+            buyerName={buyer?.name}
+            buyerPhone={buyer?.phone}
+            receiverName={order.receiver_name}
+          />
+        </Dialog>
+      </TableCell>
+    </TableRow>
+  );
+}
 
-      ) : (
-        <TableRow className="cursor-pointer">
-          <TableCell className="font-mono text-xs font-medium">
-            {order.orderId}
-          </TableCell>
-          <TableCell className="font-medium">{order.items.length}</TableCell>
-          <TableCell className="font-medium">{formattedPrice}</TableCell>
-          <TableCell className="text-muted-foreground">
-            {formatOrderDate(order.date)}
-          </TableCell>
-          <TableCell>
-            <div className="flex items-center gap-1">
-              <span className={`h-2 w-2 rounded-full ${status}`}></span>
-              <span className="font-medium text-muted-foreground">
-                {order.status}
-              </span>
-            </div>
-          </TableCell>
-          <TableCell>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <Search className="h-5 w-4" />
-                </Button>
-              </DialogTrigger>
-              <OrderDetails
-                order={order.items}
-                id={order.orderId}
-                total={order.total}
-                date={formatOrderDate(order.date)}
-                status={order.status}
-              />
-            </Dialog>
-          </TableCell>
-        </TableRow>
-      )}
-    </>
-  )
+function getStatusColor(status: string): string {
+  const statusColors: Record<string, string> = {
+    Pendente: 'bg-slate-400',
+    Preparando: 'bg-yellow-400',
+    Pronto: 'bg-green-400',
+    Cancelado: 'bg-red-400',
+  };
+  return statusColors[status] || 'hidden';
 }

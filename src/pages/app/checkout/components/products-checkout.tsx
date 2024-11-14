@@ -1,13 +1,13 @@
 import { Trash2 } from 'lucide-react'
 
+import { OrderItems, Product } from '@/@types/types'
 import { Button } from '@/components/ui/button'
 import { useStore } from '@/store'
 
 import { formatMoney } from '../../products/components/product-details'
-import { CartItem } from '@/@types/types'
 
 interface ProductDetails {
-  cupcake: CartItem
+  cupcake: OrderItems & Pick<Product, 'name' | 'description' | 'img' | 'price'>
 }
 
 export function ProductsCheckout({ cupcake }: ProductDetails) {
@@ -16,16 +16,20 @@ export function ProductsCheckout({ cupcake }: ProductDetails) {
   const formattedPrice = formatMoney(cupcake.price)
 
   function handleRemove() {
-    removeCartItem(cupcake.id)
+    removeCartItem(cupcake.order_item_id)
   }
 
   return (
-    <div className="flex w-[98%] items-end justify-between">
+    <div className="flex w-[98%] items-end justify-between rounded-lg border bg-card p-2 shadow-sm">
       <div className="flex gap-3">
         <img src={cupcake.img} alt="" className="h-32 min-w-[150px] rounded" />
         <div className="flex flex-col gap-1">
           <p className="text-lg font-semibold">{cupcake.name}</p>
-          <p className="text-sm">{cupcake.description.length > 60 ? cupcake.description.substring(0, 60).concat("...") : cupcake.description}</p>
+          <p className="text-sm">
+            {cupcake.description.length > 60
+              ? cupcake.description.substring(0, 60).concat('...')
+              : cupcake.description}
+          </p>
           <p className="text-sm font-semibold">
             Quantidade: <span>{cupcake.quantity}</span>
           </p>
