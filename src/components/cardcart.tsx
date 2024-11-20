@@ -1,10 +1,10 @@
 import { Trash2 } from 'lucide-react'
 
 import { OrderItems, Product } from '@/@types/types'
+import { formatMoney } from '@/pages/app/products/components/product-details'
 import { useStore } from '@/store'
 
 import { QuantityInput } from './quantity-input'
-import { formatMoney } from '@/pages/app/products/components/product-details'
 
 interface CupcakeCardCartProps {
   cartItem: OrderItems

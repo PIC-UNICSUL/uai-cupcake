@@ -15,16 +15,11 @@ import {
 } from '@/components/ui/table'
 import { useStore } from '@/store'
 
-import { OrderTableRow } from './components/order-table-row'
 import { OrderTableFilter } from './components/order-table-filter'
+import { OrderTableRow } from './components/order-table-row'
 
 export function Orders() {
-  const {
-    user,
-    orders,
-    fetchAllOrders,
-    fetchUserOrders,
-  } = useStore()
+  const { user, orders, fetchAllOrders, fetchUserOrders } = useStore()
 
   const [pageIndex, setPageIndex] = useState(0)
   const itemsPerPage = 6
@@ -56,9 +51,9 @@ export function Orders() {
             {orders.length > 0 ? (
               <div>
                 <OrderTableFilter />
-    
+
                 <div>
-                  <div className="rounded-md border">
+                  <div className="overflow-x-auto rounded-md border">
                     <Table>
                       <TableHeader>
                         <TableRow>
@@ -137,10 +132,7 @@ export function Orders() {
                     </TableHeader>
                     <TableBody>
                       {paginatedOrders.map((order) => (
-                        <OrderTableRow 
-                          key={order.order_id} 
-                          order={order}
-                        />
+                        <OrderTableRow key={order.order_id} order={order} />
                       ))}
                     </TableBody>
                   </Table>

@@ -42,10 +42,15 @@ const productEditFormSchema = z.object({
 type ProductEditForm = z.infer<typeof productEditFormSchema>
 
 export function ProductEdit({ cupcake, onClose }: ProductEditProps) {
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
 
-  const { updateProduct } = useStore();
-  const { register, handleSubmit, formState: { errors }, setValue } = useForm<ProductEditForm>({
+  const { updateProduct } = useStore()
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+  } = useForm<ProductEditForm>({
     resolver: zodResolver(productEditFormSchema),
     defaultValues: {
       name: cupcake.name,
@@ -54,39 +59,40 @@ export function ProductEdit({ cupcake, onClose }: ProductEditProps) {
       category: cupcake.category,
       img: cupcake.img, // Aqui pode ser uma string, a URL da imagem atual
     },
-  });
+  })
 
   function handleImageChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
+    const file = event.target.files?.[0]
     if (file) {
-      setValue('img', file); // Define o img como um File
-      const previewUrl = URL.createObjectURL(file); // Cria uma URL para o arquivo selecionado
-      setImagePreview(previewUrl); // Atualiza o estado com a URL da imagem
+      setValue('img', file) // Define o img como um File
+      const previewUrl = URL.createObjectURL(file) // Cria uma URL para o arquivo selecionado
+      setImagePreview(previewUrl) // Atualiza o estado com a URL da imagem
     }
   }
 
   async function handleUpdateProduct(data: ProductEditForm) {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000))
 
       const dataFormatted = {
         ...data,
         product_id: cupcake.product_id,
         price: Number(data.price),
-        img: data.img instanceof File ? URL.createObjectURL(data.img) : data.img, // Trata como string ou File
-      };
-
-      const errorMessage = updateProduct(dataFormatted);
-
-      if (typeof errorMessage === 'string') {
-        toast.error(errorMessage);
-        return;
+        img:
+          data.img instanceof File ? URL.createObjectURL(data.img) : data.img, // Trata como string ou File
       }
 
-      toast.success('Produto atualizado com sucesso!');
-      onClose();
+      const errorMessage = updateProduct(dataFormatted)
+
+      if (typeof errorMessage === 'string') {
+        toast.error(errorMessage)
+        return
+      }
+
+      toast.success('Produto atualizado com sucesso!')
+      onClose()
     } catch (error) {
-      toast.error('Erro ao atualizar produto');
+      toast.error('Erro ao atualizar produto')
     }
   }
 
@@ -95,35 +101,69 @@ export function ProductEdit({ cupcake, onClose }: ProductEditProps) {
       <DialogHeader>
         <DialogTitle>Editar Cupcake: {cupcake.name}</DialogTitle>
       </DialogHeader>
-      <form onSubmit={handleSubmit(handleUpdateProduct)} className="flex flex-col gap-5">
-        <Input type="text" id="name" {...register('name')} placeholder="Informe o novo nome" />
+      <form
+        onSubmit={handleSubmit(handleUpdateProduct)}
+        className="flex flex-col gap-5"
+      >
+        <Input
+          type="text"
+          id="name"
+          {...register('name')}
+          placeholder="Informe o novo nome"
+        />
         {errors.name && <p className="text-red-500">{errors.name.message}</p>}
 
-        <Textarea {...register('description')} placeholder="Informe uma nova descrição" />
-        {errors.description && <p className="text-red-500">{errors.description.message}</p>}
+        <Textarea
+          {...register('description')}
+          placeholder="Informe uma nova descrição"
+        />
+        {errors.description && (
+          <p className="text-red-500">{errors.description.message}</p>
+        )}
 
         <Input type="text" placeholder="00,0" {...register('price')} />
         {errors.price && <p className="text-red-500">{errors.price.message}</p>}
 
-        <Input type="text" placeholder={cupcake.category} {...register('category')} />
-        {errors.category && <p className="text-red-500">{errors.category.message}</p>}
+        <Input
+          type="text"
+          placeholder={cupcake.category}
+          {...register('category')}
+        />
+        {errors.category && (
+          <p className="text-red-500">{errors.category.message}</p>
+        )}
 
         {imagePreview ? (
           <div className="mt-4">
-            <img src={imagePreview} alt="Pré-visualização do cupcake" className="h-10 w-10 object-cover" />
+            <img
+              src={imagePreview}
+              alt="Pré-visualização do cupcake"
+              className="h-10 w-10 object-cover"
+            />
           </div>
         ) : (
           <div className="space-y-1">
             <p>Imagem: </p>
-            {cupcake.img && <img src={cupcake.img} alt="Imagem atual do cupcake" className="h-10 w-10 object-cover" />}
+            {cupcake.img && (
+              <img
+                src={cupcake.img}
+                alt="Imagem atual do cupcake"
+                className="h-10 w-10 object-cover"
+              />
+            )}
           </div>
         )}
 
-        <Input type="file" id="image" accept="image/*" onChange={handleImageChange} />
+        <Input
+          type="file"
+          id="image"
+          accept="image/*"
+          onChange={handleImageChange}
+        />
         {errors.img && <p className="text-red-500">{errors.img.message}</p>}
 
         <Button type="submit">Salvar</Button>
       </form>
     </DialogContent>
-  );
+  )
 }

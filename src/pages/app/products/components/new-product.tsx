@@ -16,7 +16,6 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { useStore } from '@/store'
 
-// Schema de validação usando Zod
 const newCupcakeFormSchema = z.object({
   name: z
     .string()
@@ -33,11 +32,10 @@ const newCupcakeFormSchema = z.object({
   }),
 })
 
-// Tipo inferido a partir do esquema de validação
 type NewCupcakeForm = z.infer<typeof newCupcakeFormSchema>
 
 interface NewProductProps {
-  onClose: () => void // Função para fechar o modal
+  onClose: () => void
 }
 
 export function NewProduct({ onClose }: NewProductProps) {
@@ -66,8 +64,6 @@ export function NewProduct({ onClose }: NewProductProps) {
   // Função chamada ao submeter o formulário
   async function handleNewProduct(data: NewCupcakeForm) {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-
       const newProduct = {
         ...data,
         price: parseFloat(data.price.replace(',', '.')),

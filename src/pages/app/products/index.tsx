@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
 import { v4 as uuidv4 } from 'uuid'
@@ -21,17 +21,18 @@ export function Products() {
 
   const { signed, user, addProductsToCart, products } = useStore()
 
-  function handleIncrease(id: number) {
-    setQuantities((prevState) => ({
-      ...prevState,
-      [id]: (prevState[id] || 0) + 1,
-    }))
-  }
+  const filteredProducts = useMemo(() => {
+    return products.filter(
+      (product) =>
+        product.availability_status === 'Disponível' ||
+        user?.user_type === 'admin',
+    )
+  }, [products, user])
 
-  function handleDecrease(id: number) {
+  function handleQuantityChange(id: number, type: 'increase' | 'decrease') {
     setQuantities((prevState) => ({
       ...prevState,
-      [id]: Math.max((prevState[id] || 0) - 1, 0),
+      [id]: Math.max((prevState[id] || 0) + (type === 'increase' ? 1 : -1), 0),
     }))
   }
 
@@ -56,7 +57,7 @@ export function Products() {
     <div className="flex min-h-screen flex-col gap-6">
       <div className="w-full md:w-1/3">
         <p className="text-semibold text-xl lg:text-4xl">Todos</p>
-        <p className="text-muted-foreground text-sm md:text-base">
+        <p className="text-sm text-muted-foreground md:text-base">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
           eiusmod tempor incididunt ut labore et dolore magna aliqua.
         </p>
@@ -65,8 +66,11 @@ export function Products() {
       <div className="grid w-full md:grid-cols-[220px_1fr] lg:grid-cols-[450px_1fr]">
         <div>
           <div className="flex items-center gap-4 pb-5">
-            <p className="font-semibold text-sm md:text-base">Filtros</p>
-            <Button variant="link" className="h-1 text-sm md:text-base text-muted-foreground">
+            <p className="text-sm font-semibold md:text-base">Filtros</p>
+            <Button
+              variant="link"
+              className="h-1 text-sm text-muted-foreground md:text-base"
+            >
               Limpar filtros
             </Button>
           </div>
@@ -128,31 +132,35 @@ export function Products() {
                   <SelectItem value="item5">Item5</SelectItem>
                 </SelectMenu>
                 <p className="text-sm">
-                  {products.length} produtos encontrados
+                  {filteredProducts.length} produtos encontrados
                 </p>
               </div>
-              <div className="w-full">
+              <section className="w-full">
                 <div className="flex flex-col gap-4 sm:items-end">
                   <div className="w-full md:w-4/5">
-                    {products.map((cupcake) => {
-                      return (
-                        <ProductDetails
-                          key={cupcake.product_id}
-                          cupcake={cupcake}
-                          quantityInput={
-                            <QuantityInput
-                              quantity={quantities[cupcake.product_id] || 0}
-                              onIncrease={() =>
-                                handleIncrease(cupcake.product_id)
-                              }
-                              onDecrease={() =>
-                                handleDecrease(cupcake.product_id)
-                              }
-                            />
-                          }
-                        />
-                      )
-                    })}
+                    {filteredProducts.map((product) => (
+                      <ProductDetails
+                        key={product.product_id}
+                        cupcake={product}
+                        quantityInput={
+                          <QuantityInput
+                            quantity={quantities[product.product_id] || 0}
+                            onIncrease={() =>
+                              handleQuantityChange(
+                                product.product_id,
+                                'increase',
+                              )
+                            }
+                            onDecrease={() =>
+                              handleQuantityChange(
+                                product.product_id,
+                                'decrease',
+                              )
+                            }
+                          />
+                        }
+                      />
+                    ))}
                   </div>
                   {signed ? (
                     <div className="w-full text-center">
@@ -181,7 +189,7 @@ export function Products() {
                     </Link>
                   )}
                 </div>
-              </div>
+              </section>
             </div>
           </div>
         ) : (

@@ -4,7 +4,6 @@ import { immer } from 'zustand/middleware/immer'
 import { CartState, OrderItems, Product } from '@/@types/types'
 import { useStore } from '@/store'
 
-// Chaves de armazenamento
 const CART_ITEMS_STORAGE_KEY_PREFIX = 'uaiCupcakes:cartItems_'
 
 const localStorageService = {
@@ -51,7 +50,6 @@ export const createCartSlice: StateCreator<
   cartItems: [],
   cartQuantity: 0,
   cartItemsTotal: 0,
-  
 
   calculateCartTotals: () => {
     const { cartItems } = get()
@@ -85,14 +83,14 @@ export const createCartSlice: StateCreator<
         }
       })
     })
-    get().calculateCartTotals() // Atualiza totais após adição
+    get().calculateCartTotals()
     get().persistCartItems(email)
   },
 
   changeCartItemQuantity: (
     orderItemId: number,
     type: 'increase' | 'decrease',
-    email: string
+    email: string,
   ) => {
     set((state) => {
       const item = state.cartItems.find(

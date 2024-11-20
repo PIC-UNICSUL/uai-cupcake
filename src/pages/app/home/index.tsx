@@ -30,8 +30,7 @@ export function Home() {
             <div className="flex w-full flex-col items-center gap-3 p-8 sm:gap-5">
               <p className="text-3xl font-bold sm:text-5xl">Nossos produtos</p>
               <p className="text-center text-sm text-muted-foreground sm:w-3/5 sm:text-base md:w-2/5">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua.
+              Delicie-se com nossa seleção de cupcakes artesanais, feitos com ingredientes de alta qualidade e muito amor.
               </p>
               <Link to="/products">
                 <Button>Ver todos</Button>
@@ -58,30 +57,12 @@ export function Home() {
               <div className="flex justify-between text-sm sm:text-base">
                 <div className="w-1/2 p-4 ">
                   <p>
-                    Lorem Ipsum is simply dummy text of the printing and
-                    typesetting industry. Lorem Ipsum has been the industrys
-                    standard dummy text ever since the 1500s, when an unknown
-                    printer took a galley of type and scrambled it to make a
-                    type specimen book. It has survived not only five centuries,
-                    but also the leap into electronic typesetting, remaining
-                    essentially unchanged. It was popularised in the 1960s with
-                    the release of Letraset sheets containing Lorem Ipsum
-                    passages, and more recently with desktop publishing software
-                    like Aldus PageMaker including versions of Lorem Ipsum.
+                    A nossa loja começou com uma simples paixão por doces e um sonho de espalhar alegria através dos cupcakes. Cada receita é pensada com carinho para proporcionar uma experiência única em cada mordida.
                   </p>
                 </div>
                 <div className="w-1/2 p-4">
                   <p>
-                    Lorem Ipsum is simply dummy text of the printing and
-                    typesetting industry. Lorem Ipsum has been the industrys
-                    standard dummy text ever since the 1500s, when an unknown
-                    printer took a galley of type and scrambled it to make a
-                    type specimen book. It has survived not only five centuries,
-                    but also the leap into electronic typesetting, remaining
-                    essentially unchanged. It was popularised in the 1960s with
-                    the release of Letraset sheets containing Lorem Ipsum
-                    passages, and more recently with desktop publishing software
-                    like Aldus PageMaker including versions of Lorem Ipsum.
+                    Desde o início, focamos em usar os melhores ingredientes e preparar cada cupcake artesanalmente. Hoje, nos orgulhamos de oferecer uma variedade de sabores irresistíveis, que agradam a todos os gostos e celebram cada momento especial.
                   </p>
                 </div>
               </div>

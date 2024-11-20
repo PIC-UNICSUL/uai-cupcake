@@ -27,6 +27,8 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { useStore } from '@/store'
+import { formatOrderDate } from '@/utils/date-utils'
+
 import { formatMoney } from '../../products/components/product-details'
 
 interface OrderDetailsProps {
@@ -34,6 +36,7 @@ interface OrderDetailsProps {
   order: OrderItems[]
   total: string
   date: string
+  updatedDate?: Date
   status: OrderStatus
   buyerName?: string
   buyerEmail?: string
@@ -48,7 +51,9 @@ const createConfirmStatusFormSchema = () =>
     receiverName: zod.string().optional(),
   })
 
-export type ConfirmStatusFormData = zod.infer<ReturnType<typeof createConfirmStatusFormSchema>>
+export type ConfirmStatusFormData = zod.infer<
+  ReturnType<typeof createConfirmStatusFormSchema>
+>
 
 export function OrderDetails({
   order,
@@ -59,6 +64,7 @@ export function OrderDetails({
   buyerEmail,
   buyerName,
   buyerPhone,
+  updatedDate,
   receiverName,
 }: OrderDetailsProps) {
   const { updateOrderStatus, user, fetchProduct } = useStore()
@@ -66,14 +72,19 @@ export function OrderDetails({
     resolver: zodResolver(createConfirmStatusFormSchema()),
     defaultValues: {
       status,
-      receiverName: receiverName || undefined
+      receiverName: receiverName || undefined,
     },
   })
 
-  const { handleSubmit, formState: { isSubmitting }, setValue, watch } = confirmStatusForm
+  const {
+    handleSubmit,
+    formState: { isSubmitting },
+    setValue,
+    watch,
+  } = confirmStatusForm
 
-  const calculateSubtotal = (price: number, quantity: number) => 
-    formatMoney((price) * quantity)
+  const calculateSubtotal = (price: number, quantity: number) =>
+    formatMoney(price * quantity)
 
   const handleConfirmStatus = async (data: ConfirmStatusFormData) => {
     if (data.status === OrderStatus.delivered && !data.receiverName) {
@@ -118,8 +129,12 @@ export function OrderDetails({
                 return (
                   <TableRow key={item.order_item_id}>
                     <TableCell>{product?.name}</TableCell>
-                    <TableCell className="text-right">{product?.category}</TableCell>
-                    <TableCell className="text-right">{item.quantity}</TableCell>
+                    <TableCell className="text-right">
+                      {product?.category}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {item.quantity}
+                    </TableCell>
                     <TableCell className="text-right">
                       {formatMoney(product?.price || 0)}
                     </TableCell>
@@ -148,12 +163,19 @@ export function OrderDetails({
             <form onSubmit={handleSubmit(handleConfirmStatus)}>
               <div className="mb-8 flex flex-col gap-4">
                 <div className="flex gap-4">
-                  {renderContactInfo("NOME", buyerName)}
+                  {renderContactInfo('NOME', buyerName)}
+                  {receiverName &&
+                    renderContactInfo(
+                      'RETIRADO',
+                      formatOrderDate(updatedDate!),
+                    )}
                   <div className="flex items-center justify-end gap-2">
                     <p>Status:</p>
                     <SelectMenu
                       defaultValue={status}
-                      onValueChange={(value) => setValue('status', value as OrderStatus)}
+                      onValueChange={(value) =>
+                        setValue('status', value as OrderStatus)
+                      }
                       size="base"
                     >
                       {Object.values(OrderStatus).map((status) => (
@@ -166,20 +188,24 @@ export function OrderDetails({
                 </div>
 
                 <div className="flex gap-6">
-                  {renderContactInfo("CONTATO", buyerPhone)}
-                  {renderContactInfo("E-MAIL", buyerEmail)}
-                  {renderContactInfo("Criado", date)}
+                  {renderContactInfo('CONTATO', buyerPhone)}
+                  {renderContactInfo('E-MAIL', buyerEmail)}
+                  {renderContactInfo('CRIADO', date)}
                 </div>
               </div>
 
               {watch('status') === OrderStatus.delivered && (
                 <div className="flex items-center gap-2">
-                  <Label className="text-sm font-semibold">RETIRADO POR: </Label>
+                  <Label className="text-sm font-semibold">
+                    RETIRADO POR:{' '}
+                  </Label>
                   {receiverName && user?.user_type !== 'admin' ? (
-                    <p className="text-sm text-muted-foreground">{receiverName}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {receiverName}
+                    </p>
                   ) : (
                     <Input
-                      className="mt-1 rounded border w-2/3 p-2"
+                      className="mt-1 w-2/3 rounded border p-2"
                       {...confirmStatusForm.register('receiverName')}
                       placeholder="Nome"
                     />
@@ -188,7 +214,11 @@ export function OrderDetails({
               )}
 
               <div className="mt-4">
-                <Button variant="outline" className="px-14 py-6" disabled={isSubmitting}>
+                <Button
+                  variant="outline"
+                  className="px-14 py-6"
+                  disabled={isSubmitting}
+                >
                   Salvar
                 </Button>
               </div>
@@ -197,13 +227,15 @@ export function OrderDetails({
         ) : (
           <div className="mb-8 flex flex-col gap-4">
             <div className="flex gap-4">
-              {renderContactInfo("NOME", user?.name)}
-              {renderContactInfo("STATUS", status)}
+              {renderContactInfo('NOME', user?.name)}
+              {renderContactInfo('STATUS', status)}
+              {receiverName &&
+                renderContactInfo('RETIRADO', formatOrderDate(updatedDate!))}
             </div>
             <div className="flex gap-6">
-              {renderContactInfo("CONTATO", user?.phone)}
-              {renderContactInfo("E-MAIL", user?.email)}
-              {renderContactInfo("Criado", date)}
+              {renderContactInfo('CONTATO', user?.phone)}
+              {renderContactInfo('E-MAIL', user?.email)}
+              {renderContactInfo('Criado', date)}
             </div>
 
             {status === OrderStatus.delivered && (

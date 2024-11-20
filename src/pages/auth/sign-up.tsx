@@ -65,7 +65,7 @@ export function SignUp() {
   return (
     <>
       <Helmet title="Sign Up" />
-      <div className="py-8 px-2 lg:px-0">
+      <div className="px-2 py-8 lg:px-0">
         <div className="flex max-w-80 flex-col justify-center gap-6">
           <div className="flex flex-col gap-2 text-center">
             <h1 className="text-2xl font-semibold tracking-tight">

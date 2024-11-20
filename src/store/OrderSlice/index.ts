@@ -8,6 +8,7 @@ import {
   OrderStatus,
   User,
 } from '@/@types/types'
+import { useStore } from '@/store'
 
 const ALL_ORDERS_STORAGE_KEY = 'all_orders'
 export const ALL_ORDER_ITEMS_STORAGE_KEY = 'all_order_items'
@@ -41,22 +42,26 @@ export const createOrderSlice: StateCreator<
 
   fetchUserOrders: (userEmail: string) => {
     if (!userEmail) {
-      console.warn('Email do usuário está indefinido ou vazio');
-      return;
+      console.warn('Email do usuário está indefinido ou vazio')
+      return
     }
-  
-    const allUsers = JSON.parse(localStorage.getItem('uaiCupcakes:users_bd') || '[]');
+
+    const allUsers = JSON.parse(
+      localStorage.getItem('uaiCupcakes:users_bd') || '[]',
+    )
     // console.log('Usuários carregados do localStorage:', allUsers);
-  
-    const user = allUsers.find((user: User) => user.email === userEmail);
-  
+
+    const user = allUsers.find((user: User) => user.email === userEmail)
+
     if (!user) {
-      console.warn(`Nenhum usuário encontrado com o email: ${userEmail}`);
-      return;
+      console.warn(`Nenhum usuário encontrado com o email: ${userEmail}`)
+      return
     }
-  
-    const userOrders = getAllOrders().filter((order) => order.user_id === user.user_id);
-    set({ orders: userOrders });
+
+    const userOrders = getAllOrders().filter(
+      (order) => order.user_id === user.user_id,
+    )
+    set({ orders: userOrders })
   },
 
   fetchAllOrders: () => {
@@ -91,12 +96,16 @@ export const createOrderSlice: StateCreator<
     )
 
     set((state) => ({ orders: [...state.orders, newOrder] }))
+    // Limpar o carrinho após adicionar o pedido
+    useStore.getState().cleanCart(user.email)
   },
 
   fetchAllOrderItems: (order_id: number): OrderItems[] => {
-    const allOrderItems: OrderItems[] = JSON.parse(localStorage.getItem('all_order_items') || '[]');
-    
-    return allOrderItems.filter((item) => item.order_id === order_id);
+    const allOrderItems: OrderItems[] = JSON.parse(
+      localStorage.getItem('all_order_items') || '[]',
+    )
+
+    return allOrderItems.filter((item) => item.order_id === order_id)
     // return JSON.parse(localStorage.getItem(ALL_ORDER_ITEMS_STORAGE_KEY) || '[]')
   },
 
