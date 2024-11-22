@@ -19,12 +19,12 @@ export function SelectMenu({
       <Select {...props}>
         <SelectTrigger
           className={`${
-            (size === 'large' && 'w-[180px]') ||
+            (size === 'large' && 'min-w-[180px]') ||
             (size === 'base' && 'w-[130px]') ||
             (size === 'medium' && 'w-[150px]')
           }`}
         >
-          {!!prefix && <span className="text-muted-foreground">{prefix}</span>}
+          {!!prefix && <span className="text-muted-foreground pr-2">{prefix}</span>}
           <SelectValue />
         </SelectTrigger>
         <SelectContent className="font-semibold">{children}</SelectContent>

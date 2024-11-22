@@ -14,20 +14,59 @@ import { useStore } from '@/store'
 
 import { NewProduct } from './components/new-product'
 import { ProductDetails } from './components/product-details'
+import { Product } from '@/@types/types'
 
 export function Products() {
   const [quantities, setQuantities] = useState<{ [key: number]: number }>({})
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [filters, setFilters] = useState<string[]>([])
+  const [checkboxState, setCheckboxState] = useState<{ [key: string]: boolean }>({})
+  const [sortOption, setSortOption] = useState<string>('padrao')
 
-  const { signed, user, addProductsToCart, products } = useStore()
+  const { signed, user, addProductsToCart, products, addProduct } = useStore()
 
-  const filteredProducts = useMemo(() => {
-    return products.filter(
-      (product) =>
-        product.availability_status === 'Disponível' ||
-        user?.user_type === 'admin',
+  // Atualizar os filtros ao clicar no checkbox
+  function handleFilterChange(category: string, checked: boolean) {
+    setFilters((prevFilters) =>
+      checked ? [...prevFilters, category] : prevFilters.filter((f) => f !== category)
     )
-  }, [products, user])
+    setCheckboxState((prevState) => ({
+      ...prevState,
+      [category]: checked,
+    }))
+  }
+
+  function clearFilters() {
+    setFilters([])
+    setCheckboxState({})
+  }
+
+  const categories = useMemo(() => {
+    const allCategories = products.map((product) => product.category)
+    return Array.from(new Set(allCategories)) // Remove duplicatas
+  }, [products])
+
+  // Atualizar a ordenação ao selecionar uma opção
+  function handleSortChange(value: string) {
+    setSortOption(value)
+  }
+
+  // Filtrar e ordenar produtos
+  const filteredProducts = useMemo(() => {
+    let result = products.filter(
+      (product) =>
+        (filters.length === 0 || filters.includes(product.category)) &&
+        (product.availability_status === 'Disponível' || user?.user_type === 'admin')
+    )
+
+    if (sortOption === 'price-asc') {
+      result.sort((a, b) => a.price - b.price)
+    } else if (sortOption === 'price-desc') {
+      result.sort((a, b) => b.price - a.price)
+    }
+
+    return result
+  }, [products, filters, sortOption, user])
 
   function handleQuantityChange(id: number, type: 'increase' | 'decrease') {
     setQuantities((prevState) => ({
@@ -53,6 +92,12 @@ export function Products() {
     }
   }
 
+  function handleAddProduct(newProduct: Omit<Product, 'product_id' | 'availability_status'>) {
+    addProduct(newProduct) // Adiciona ao Zustand
+
+    toast.success('Cupcake adicionado com sucesso!')
+  }
+
   return (
     <div className="flex min-h-screen flex-col gap-6">
       <div className="w-full md:w-1/3">
@@ -70,6 +115,7 @@ export function Products() {
             <Button
               variant="link"
               className="h-1 text-sm text-muted-foreground md:text-base"
+              onClick={clearFilters} // Limpar filtros
             >
               Limpar filtros
             </Button>
@@ -77,37 +123,30 @@ export function Products() {
           <div>
             <p className="pb-4 text-xs font-bold">Categorias</p>
             <div className="flex flex-col gap-1">
-              <div className="flex items-center space-x-2">
-                <Checkbox id="vegano" />
-                <Label htmlFor="vegano" className="text-sm font-medium">
-                  Vegano
+            {categories.map((category) => (
+              <div key={category} className="flex items-center space-x-2">
+                <Checkbox
+                  id={category}
+                  checked={checkboxState[category] || false}
+                  onCheckedChange={(checked: boolean | string) =>
+                    handleFilterChange(category, typeof checked === 'boolean' ? checked : false)
+                  }
+                />
+                <Label htmlFor={category} className="text-sm font-medium">
+                  {category}
                 </Label>
               </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox id="tradicional" />
-                <Label htmlFor="tradicional" className="text-sm font-medium">
-                  Tradicional
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox id="glutenS" />
-                <Label htmlFor="glutenS" className="text-sm font-medium">
-                  Sem glúten
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox id="salgado" />
-                <Label htmlFor="salgado" className="text-sm font-medium">
-                  Salgado
-                </Label>
-              </div>
+            ))}
               {user?.user_type === 'admin' && (
                 <div className="mt-2">
                   <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                     <DialogTrigger asChild>
                       <Button>Adicionar novo cupcake</Button>
                     </DialogTrigger>
-                    <NewProduct onClose={() => setIsModalOpen(false)} />
+                    <NewProduct 
+                      onClose={() => setIsModalOpen(false)} 
+                      onAddProduct={handleAddProduct}
+                    />
                   </Dialog>
                 </div>
               )}
@@ -120,21 +159,24 @@ export function Products() {
             <div className="pb-11">
               <div className="flex flex-col items-end">
                 <SelectMenu
-                  defaultValue="popular"
+                  defaultValue="padrao"
                   size="large"
-                  prefix="Ordernar por "
+                  prefix="Ordenar por"
+                  onValueChange={handleSortChange}
                 >
-                  <SelectItem value="popular">Popular</SelectItem>
-                  <SelectItem value="item1">Item1</SelectItem>
-                  <SelectItem value="item2">Item2</SelectItem>
-                  <SelectItem value="item3">Item3</SelectItem>
-                  <SelectItem value="item4">Item4</SelectItem>
-                  <SelectItem value="item5">Item5</SelectItem>
+                  <SelectItem value="padrao">Padrão</SelectItem>
+                  <SelectItem value="price-asc">Preço: Menor para maior</SelectItem>
+                  <SelectItem value="price-desc">Preço: Maior para menor</SelectItem>
                 </SelectMenu>
                 <p className="text-sm">
                   {filteredProducts.length} produtos encontrados
                 </p>
               </div>
+              {filteredProducts.length == 0 && (
+                <div className="flex h-full items-center justify-center">
+                  <p className="text-2xl font-semibold">Nenhum produto encontrado</p>
+                </div>
+              )}
               <section className="w-full">
                 <div className="flex flex-col gap-4 sm:items-end">
                   <div className="w-full md:w-4/5">
@@ -163,14 +205,14 @@ export function Products() {
                     ))}
                   </div>
                   {signed ? (
-                    <div className="w-full text-center">
+                    <div className={`w-full text-center ${filteredProducts.length == 0 && 'hidden'} `}>
                       <Button
                         className="w-3/6 transition disabled:cursor-default disabled:opacity-40"
                         disabled={
                           products.filter(
                             (cupcake) =>
                               (quantities[cupcake.product_id] || 0) > 0,
-                          ).length == 0
+                          ).length == 0 
                         }
                         variant="outline"
                         onClick={handleAddToCart}
@@ -193,9 +235,10 @@ export function Products() {
             </div>
           </div>
         ) : (
-          <div className="flex h-full items-center justify-center">
-            <p className="text-2xl font-semibold">Nenhum produto encontrado</p>
-          </div>
+            
+            <div className="flex h-full items-center justify-center">
+              <p className="text-2xl font-semibold">Nenhum produto encontrado</p>
+            </div>
         )}
       </div>
     </div>

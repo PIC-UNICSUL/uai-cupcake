@@ -16,7 +16,7 @@ export const Cupcakes: Product[] = [
     img: '/cupcakes/blueberry.jpg',
     description:
       'Massa de baunilha com recheio e cobertura de brigadeiro de blueberry.',
-    category: 'Edição limitada',
+    category: 'Vegano',
     availability_status: productStatus.available,
     price: 12.0,
   },
@@ -56,7 +56,7 @@ export const Cupcakes: Product[] = [
     img: '/cupcakes/ovomaltine.jpg',
     description:
       'Massa de ovomaltine, recheio de chocolate fidge e cobertura de brigadeiro preto com ovomaltine polvilhado.',
-    category: 'Edição limitada',
+    category: 'Vegano',
     availability_status: productStatus.available,
     price: 15.0,
   },
@@ -86,7 +86,7 @@ export const Cupcakes: Product[] = [
     img: '/cupcakes/doce_leite.jpg',
     description:
       'Massa de baunilha com recheio de doce de leite e cobertura de glacê de cream chesse com toque de cacau.',
-    category: 'Edição limitada',
+    category: 'Tradicional',
     availability_status: productStatus.available,
     price: 12.0,
   },
@@ -96,7 +96,7 @@ export const Cupcakes: Product[] = [
     img: '/cupcakes/maracuja.jpg',
     description:
       'Massa de maracujá crocante, recheio de brigadeiro de maracujá e cobertura de brigadeiro branco.',
-    category: 'Tradicional',
+    category: 'Clássico',
     availability_status: productStatus.available,
     price: 80.0,
   },

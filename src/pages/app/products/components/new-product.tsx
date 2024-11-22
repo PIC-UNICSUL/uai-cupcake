@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { useStore } from '@/store'
+import { Product } from '@/@types/types'
 
 const newCupcakeFormSchema = z.object({
   name: z
@@ -36,9 +37,10 @@ type NewCupcakeForm = z.infer<typeof newCupcakeFormSchema>
 
 interface NewProductProps {
   onClose: () => void
+  onAddProduct: (newProduct: Omit<Product, 'product_id' | 'availability_status'>) => void
 }
 
-export function NewProduct({ onClose }: NewProductProps) {
+export function NewProduct({ onClose, onAddProduct }: NewProductProps) {
   const {
     register,
     handleSubmit,
@@ -47,7 +49,6 @@ export function NewProduct({ onClose }: NewProductProps) {
   } = useForm<NewCupcakeForm>({
     resolver: zodResolver(newCupcakeFormSchema),
   })
-  const { addProduct } = useStore()
 
   const [imagePreview, setImagePreview] = useState<string | null>(null)
 
@@ -66,18 +67,13 @@ export function NewProduct({ onClose }: NewProductProps) {
     try {
       const newProduct = {
         ...data,
+        category: data.category,
         price: parseFloat(data.price.replace(',', '.')),
         img: data.img ? URL.createObjectURL(data.img) : '',
       }
 
-      const errorMessage = addProduct(newProduct)
-
-      if (typeof errorMessage === 'string') {
-        toast.error(errorMessage)
-        return
-      }
-
-      toast.success('Produto cadastrado com sucesso!')
+      // const errorMessage = addProduct(newProduct)
+      onAddProduct(newProduct)
       onClose()
     } catch (error) {
       toast.error('Erro ao cadastrar produto')
