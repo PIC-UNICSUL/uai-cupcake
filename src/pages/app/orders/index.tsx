@@ -1,56 +1,90 @@
-import { useEffect, useState } from 'react'
-import { Helmet } from 'react-helmet-async'
+import { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 
-import { SelectMenu } from '@/components/menus'
-import { NavLink } from '@/components/nav-link'
-import { Pagination } from '@/components/pagination'
-import { SelectItem } from '@/components/ui/select'
-import { Separator } from '@/components/ui/separator'
+import { SelectMenu } from '@/components/menus';
+import { NavLink } from '@/components/nav-link';
+import { Pagination } from '@/components/pagination';
+import { SelectItem } from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
 import {
   Table,
   TableBody,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { useStore } from '@/store'
+} from '@/components/ui/table';
+import { useStore } from '@/store';
 
-import { OrderTableFilter } from './components/order-table-filter'
-import { OrderTableRow } from './components/order-table-row'
+import { OrderTableFilter } from './components/order-table-filter';
+import { OrderTableRow } from './components/order-table-row';
 
 export function Orders() {
-  const { user, orders, fetchAllOrders, fetchUserOrders } = useStore()
+  const { user, orders, fetchAllOrders, fetchUserOrders } = useStore();
 
-  const [pageIndex, setPageIndex] = useState(0)
-  const itemsPerPage = 6
+  const [pageIndex, setPageIndex] = useState(0);
+  const [timeFilter, setTimeFilter] = useState('month');
+  const [statusFilter, setStatusFilter] = useState('all');
 
-  const paginatedOrders = orders.slice(
+  const itemsPerPage = 6;
+
+  // Atualizar filtros
+  const handleFilterChange = (filterType: 'time' | 'status', value: string) => {
+    if (filterType === 'time') setTimeFilter(value);
+    if (filterType === 'status') setStatusFilter(value);
+  };
+
+  // Filtrar os pedidos
+  const filteredOrders = orders.filter((order) => {
+    const now = new Date();
+    const orderDate = new Date(order.created_at);
+
+    const timeCondition =
+      timeFilter === 'month'
+        ? orderDate.getMonth() === now.getMonth() &&
+          orderDate.getFullYear() === now.getFullYear()
+        : timeFilter === 'week'
+        ? orderDate >= new Date(now.setDate(now.getDate() - 7))
+        : timeFilter === 'year'
+        ? orderDate.getFullYear() === now.getFullYear()
+        : true;
+
+    const statusCondition = statusFilter === 'all' || order.status === statusFilter;
+
+    return timeCondition && statusCondition;
+  });
+
+  // Pedidos paginados
+  const paginatedOrders = filteredOrders.slice(
     pageIndex * itemsPerPage,
-    (pageIndex + 1) * itemsPerPage,
-  )
+    (pageIndex + 1) * itemsPerPage
+  );
 
   useEffect(() => {
     if (user) {
       if (user.user_type === 'admin') {
-        fetchAllOrders()
+        fetchAllOrders();
       } else {
-        fetchUserOrders(user.email)
+        fetchUserOrders(user.email);
       }
     }
-  }, [user, fetchUserOrders, fetchAllOrders])
+  }, [user, fetchUserOrders, fetchAllOrders]);
 
   return (
     <>
       <Helmet title="Pedidos" />
       {user?.user_type === 'admin' ? (
         <div>
-          <h1 className="text-xl font-semibold sm:text-2xl md:text-4xl">
+          <h1 className="text-xl mb-4 sm:mb-0 font-semibold sm:text-2xl md:text-4xl">
             Pedidos
           </h1>
           <div>
             {orders.length > 0 ? (
               <div>
-                <OrderTableFilter />
+                <OrderTableFilter 
+                  timeFilter={timeFilter}
+                  statusFilter={statusFilter}
+                  onFilterChange={handleFilterChange}
+                />
 
                 <div>
                   <div className="overflow-x-auto rounded-md border">
@@ -75,7 +109,7 @@ export function Orders() {
                   </div>
                   <Pagination
                     pageIndex={pageIndex}
-                    totalCount={orders.length}
+                    totalCount={filteredOrders.length}
                     perPage={itemsPerPage}
                     onPageChange={(newPage) => setPageIndex(newPage)}
                   />
@@ -111,9 +145,13 @@ export function Orders() {
           {orders.length > 0 ? (
             <div>
               <div className="flex justify-end pb-2 md:pb-5 md:pt-7">
-                <SelectMenu defaultValue="mounth" size="medium">
-                  <SelectItem value="mounth">Último mês</SelectItem>
-                  <SelectItem value="weak">Última semana</SelectItem>
+                <SelectMenu
+                  value={timeFilter}
+                  onValueChange={(value) => setTimeFilter(value)}
+                  size="medium"
+                >
+                  <SelectItem value="month">Último mês</SelectItem>
+                  <SelectItem value="week">Última semana</SelectItem>
                   <SelectItem value="year">Último ano</SelectItem>
                 </SelectMenu>
               </div>
@@ -139,7 +177,7 @@ export function Orders() {
                 </div>
                 <Pagination
                   pageIndex={pageIndex}
-                  totalCount={orders.length}
+                  totalCount={filteredOrders.length}
                   perPage={itemsPerPage}
                   onPageChange={(newPage) => setPageIndex(newPage)}
                 />
@@ -153,5 +191,5 @@ export function Orders() {
         </div>
       )}
     </>
-  )
+  );
 }

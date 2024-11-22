@@ -21,7 +21,7 @@ export function SelectMenu({
           className={`${
             (size === 'large' && 'min-w-[180px]') ||
             (size === 'base' && 'w-[130px]') ||
-            (size === 'medium' && 'w-[150px]')
+            (size === 'medium' && 'max-w-36 sm:w-[150px]')
           }`}
         >
           {!!prefix && <span className="text-muted-foreground pr-2">{prefix}</span>}

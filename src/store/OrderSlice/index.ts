@@ -87,6 +87,7 @@ export const createOrderSlice: StateCreator<
       order_id: orderId,
       created_at: new Date(),
     }))
+    
     const existingOrderItems = JSON.parse(
       localStorage.getItem(ALL_ORDER_ITEMS_STORAGE_KEY) || '[]',
     )
@@ -126,8 +127,6 @@ export const createOrderSlice: StateCreator<
           }
         : order,
     )
-
-    console.log('updatedOrders: ', updatedOrders)
 
     saveOrders(updatedOrders)
     set({ orders: updatedOrders })

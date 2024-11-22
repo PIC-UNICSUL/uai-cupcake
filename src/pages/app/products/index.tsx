@@ -15,6 +15,7 @@ import { useStore } from '@/store'
 import { NewProduct } from './components/new-product'
 import { ProductDetails } from './components/product-details'
 import { Product } from '@/@types/types'
+import { CirclePlus } from 'lucide-react'
 
 export function Products() {
   const [quantities, setQuantities] = useState<{ [key: number]: number }>({})
@@ -122,7 +123,7 @@ export function Products() {
           </div>
           <div>
             <p className="pb-4 text-xs font-bold">Categorias</p>
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-1 mb-4 sm:mb-0">
             {categories.map((category) => (
               <div key={category} className="flex items-center space-x-2">
                 <Checkbox
@@ -141,7 +142,7 @@ export function Products() {
                 <div className="mt-2">
                   <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                     <DialogTrigger asChild>
-                      <Button>Adicionar novo cupcake</Button>
+                      <Button className="flex gap-2"><CirclePlus className="h-4 w-4" />Cupcake</Button>
                     </DialogTrigger>
                     <NewProduct 
                       onClose={() => setIsModalOpen(false)} 
