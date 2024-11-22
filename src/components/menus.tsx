@@ -24,7 +24,9 @@ export function SelectMenu({
             (size === 'medium' && 'max-w-36 sm:w-[150px]')
           }`}
         >
-          {!!prefix && <span className="text-muted-foreground pr-2">{prefix}</span>}
+          {!!prefix && (
+            <span className="pr-2 text-muted-foreground">{prefix}</span>
+          )}
           <SelectValue />
         </SelectTrigger>
         <SelectContent className="font-semibold">{children}</SelectContent>

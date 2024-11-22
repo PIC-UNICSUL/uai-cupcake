@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
+import { Product } from '@/@types/types'
 import { Button } from '@/components/ui/button'
 import {
   DialogContent,
@@ -14,8 +15,6 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { useStore } from '@/store'
-import { Product } from '@/@types/types'
 
 const newCupcakeFormSchema = z.object({
   name: z
@@ -37,7 +36,9 @@ type NewCupcakeForm = z.infer<typeof newCupcakeFormSchema>
 
 interface NewProductProps {
   onClose: () => void
-  onAddProduct: (newProduct: Omit<Product, 'product_id' | 'availability_status'>) => void
+  onAddProduct: (
+    newProduct: Omit<Product, 'product_id' | 'availability_status'>,
+  ) => void
 }
 
 export function NewProduct({ onClose, onAddProduct }: NewProductProps) {

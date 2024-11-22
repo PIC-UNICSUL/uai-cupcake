@@ -2,9 +2,9 @@ import { SelectMenu } from '@/components/menus'
 import { SelectItem } from '@/components/ui/select'
 
 interface OrderTableFilterProps {
-  timeFilter: string;
-  statusFilter: string;
-  onFilterChange: (filterType: 'time' | 'status', value: string) => void;
+  timeFilter: string
+  statusFilter: string
+  onFilterChange: (filterType: 'time' | 'status', value: string) => void
 }
 
 export function OrderTableFilter({
@@ -12,12 +12,8 @@ export function OrderTableFilter({
   statusFilter,
   onFilterChange,
 }: OrderTableFilterProps) {
-
-
   return (
-    <div
-      className="flex w-full items-center justify-end gap-2"
-    >
+    <div className="flex w-full items-center justify-end gap-2">
       <div className="flex justify-end pb-2 md:pb-5 md:pt-7">
         <SelectMenu
           value={timeFilter}
@@ -44,5 +40,5 @@ export function OrderTableFilter({
         </SelectMenu>
       </div>
     </div>
-  );
+  )
 }

@@ -11,12 +11,12 @@ interface ProductDetails {
 }
 
 export function ProductsCheckout({ cupcake }: ProductDetails) {
-  const { removeCartItem } = useStore()
+  const { removeCartItem, user } = useStore()
 
   const formattedPrice = formatMoney(cupcake.price)
 
   function handleRemove() {
-    removeCartItem(cupcake.order_item_id)
+    removeCartItem(cupcake.order_item_id, user?.email ?? '')
   }
 
   return (

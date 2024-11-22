@@ -54,7 +54,7 @@ export function Header() {
         <NavigationLinks />
 
         {/* Área de Ações do Usuário */}
-        <div className="ml-auto flex items-center -mr-4 sm:-mr-0 sm:gap-1 sm:space-x-2">
+        <div className="-mr-4 ml-auto flex items-center sm:-mr-0 sm:gap-1 sm:space-x-2">
           {signed ? (
             <UserMenu
               user={user}
@@ -112,7 +112,7 @@ interface UserMenuProps {
 
 function AdminMenu({ onSignOut }: { onSignOut: () => void }) {
   return (
-    <div className="space-x-2 hidden sm:flex">
+    <div className="hidden space-x-2 sm:flex">
       <NavLink to="/orders">Pedidos</NavLink>
       <Button
         className="text-rose-500 dark:text-rose-400"
@@ -164,14 +164,16 @@ function CustomerMenu({
         <Sheet>
           <SheetTrigger className="flex items-center gap-2 px-2 py-2">
             <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5" />
-            <span className={`text-xs font-semibold sm:text-sm ${cartQuantityLabel == 0 && 'hidden'}`}>
+            <span
+              className={`text-xs font-semibold sm:text-sm ${cartQuantityLabel === 0 && 'hidden'}`}
+            >
               {cartQuantityLabel}
             </span>
           </SheetTrigger>
           <Cart />
         </Sheet>
       </div>
-      <div className="sm:block hidden">
+      <div className="hidden sm:block">
         <AccountMenu />
       </div>
       {user?.email === 'admin@email.com' && user.user_type !== 'admin' && (
@@ -179,7 +181,7 @@ function CustomerMenu({
           size="custom"
           variant="ghost"
           onClick={onPromoteToAdmin}
-          className="sm:block hidden p-2"
+          className="hidden p-2 sm:block"
         >
           Admin
         </Button>
@@ -224,9 +226,7 @@ function MobileMenu({ onPromoteToAdmin }: MobileMenuProps) {
                 <Separator />
                 {user?.user_type === userType.admin ? (
                   <>
-                    <NavLink to="/orders">
-                      Pedidos
-                    </NavLink>
+                    <NavLink to="/orders">Pedidos</NavLink>
                     <div>
                       <Button
                         className="text-rose-500 dark:text-rose-400"
@@ -269,10 +269,9 @@ function MobileMenu({ onPromoteToAdmin }: MobileMenuProps) {
                         onClick={handleSignOut}
                       >
                         <LogOut className="mr-2 h-4 w-4" />
-                          <span>Sair</span>
+                        <span>Sair</span>
                       </Button>
                     </div>
-                    
                   </>
                 )}
               </>

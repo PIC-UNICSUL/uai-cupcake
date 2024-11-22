@@ -23,7 +23,7 @@ export function Cart() {
       <SheetHeader>
         <SheetTitle>Carrinho de compras</SheetTitle>
         <SheetDescription>
-          {cartItems.length == 0
+          {cartItems.length === 0
             ? 'Nenhum cupcake selecionado'
             : 'Cupcakes selecionados'}
         </SheetDescription>

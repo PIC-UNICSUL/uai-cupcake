@@ -10,8 +10,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useStore } from '@/store'
-import { useMutation } from '@tanstack/react-query'
-import { signUp } from '@/api/sign-up'
+// import { useMutation } from '@tanstack/react-query'
+// import { signUp } from '@/api/sign-up'
 
 const signUpFormSchema = z.object({
   name: z
@@ -46,9 +46,9 @@ export function SignUp() {
     resolver: zodResolver(signUpFormSchema),
   })
 
-  const { mutateAsync: newAccount } = useMutation({
-    mutationFn: signUp,
-  })
+  // const { mutateAsync: newAccount } = useMutation({
+  //   mutationFn: signUp,
+  // })
 
   async function handleSignUp(data: SignUpForm) {
     try {

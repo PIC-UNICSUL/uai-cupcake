@@ -18,15 +18,23 @@ export function CardCart({ cartItem }: CupcakeCardCartProps) {
   ) as Product
 
   function handleIncrease() {
-    changeCartItemQuantity(cartItem.order_item_id, 'increase', user?.email!)
+    changeCartItemQuantity(
+      cartItem.order_item_id,
+      'increase',
+      user?.email ?? '',
+    )
   }
 
   function handleDecrease() {
-    changeCartItemQuantity(cartItem.order_item_id, 'decrease', user?.email!)
+    changeCartItemQuantity(
+      cartItem.order_item_id,
+      'decrease',
+      user?.email ?? '',
+    )
   }
 
   function handleRemove() {
-    removeCartItem(cartItem.order_item_id, user?.email!)
+    removeCartItem(cartItem.order_item_id, user?.email ?? '')
   }
 
   const formattedPrice = formatMoney(cupcake?.price * cartItem.quantity)

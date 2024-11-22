@@ -4,7 +4,7 @@ import { useStore } from '@/store'
 export function RequireAuth({ children }: { children: JSX.Element }) {
   const { user } = useStore()
 
-  if (!user || !user.admin) {
+  if (!user || user.user_type === 'admin') {
     return <NotFound />
   }
 

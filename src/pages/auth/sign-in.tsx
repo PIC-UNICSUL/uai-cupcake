@@ -8,8 +8,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useStore } from '@/store'
-import { useMutation } from '@tanstack/react-query'
-import { signIn } from '@/api/sign-in'
+// import { useMutation } from '@tanstack/react-query'
+// import { signIn } from '@/api/sign-in'
 
 const signInSchema = z.object({
   email: z
@@ -40,9 +40,9 @@ export function SignIn() {
     },
   })
 
-  const { mutateAsync: authenticate } = useMutation({
-    mutationFn: signIn,
-  })
+  // const { mutateAsync: authenticate } = useMutation({
+  //   mutationFn: signIn,
+  // })
 
   async function handleAuthenticate(data: SignInSchema) {
     try {

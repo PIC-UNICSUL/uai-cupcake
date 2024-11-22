@@ -30,7 +30,8 @@ export function Home() {
             <div className="flex w-full flex-col items-center gap-3 p-8 sm:gap-5">
               <p className="text-3xl font-bold sm:text-5xl">Nossos produtos</p>
               <p className="text-center text-sm text-muted-foreground sm:w-3/5 sm:text-base md:w-2/5">
-              Delicie-se com nossa seleção de cupcakes artesanais, feitos com ingredientes de alta qualidade e muito amor.
+                Delicie-se com nossa seleção de cupcakes artesanais, feitos com
+                ingredientes de alta qualidade e muito amor.
               </p>
               <Link to="/products">
                 <Button>Ver todos</Button>
@@ -57,12 +58,18 @@ export function Home() {
               <div className="flex justify-between text-sm sm:text-base">
                 <div className="w-1/2 p-4 ">
                   <p>
-                    A nossa loja começou com uma simples paixão por doces e um sonho de espalhar alegria através dos cupcakes. Cada receita é pensada com carinho para proporcionar uma experiência única em cada mordida.
+                    A nossa loja começou com uma simples paixão por doces e um
+                    sonho de espalhar alegria através dos cupcakes. Cada receita
+                    é pensada com carinho para proporcionar uma experiência
+                    única em cada mordida.
                   </p>
                 </div>
                 <div className="w-1/2 p-4">
                   <p>
-                    Desde o início, focamos em usar os melhores ingredientes e preparar cada cupcake artesanalmente. Hoje, nos orgulhamos de oferecer uma variedade de sabores irresistíveis, que agradam a todos os gostos e celebram cada momento especial.
+                    Desde o início, focamos em usar os melhores ingredientes e
+                    preparar cada cupcake artesanalmente. Hoje, nos orgulhamos
+                    de oferecer uma variedade de sabores irresistíveis, que
+                    agradam a todos os gostos e celebram cada momento especial.
                   </p>
                 </div>
               </div>

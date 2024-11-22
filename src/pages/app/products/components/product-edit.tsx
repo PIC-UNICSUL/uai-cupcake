@@ -57,7 +57,7 @@ export function ProductEdit({ cupcake, onClose }: ProductEditProps) {
       description: cupcake.description,
       price: String(cupcake.price),
       category: cupcake.category,
-      img: cupcake.img, // Aqui pode ser uma string, a URL da imagem atual
+      img: cupcake.img || '', // Aqui pode ser uma string, a URL da imagem atual
     },
   })
 
