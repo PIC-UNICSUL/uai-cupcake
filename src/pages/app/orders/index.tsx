@@ -118,7 +118,7 @@ export function Orders() {
                 </SelectMenu>
               </div>
               <div>
-                <div className="rounded-md border">
+                <div className="rounded-md borde overflow-x-auto border">
                   <Table>
                     <TableHeader>
                       <TableRow>
