@@ -98,7 +98,7 @@ export const Cupcakes: Product[] = [
       'Massa de maracujá crocante, recheio de brigadeiro de maracujá e cobertura de brigadeiro branco.',
     category: 'Clássico',
     availability_status: productStatus.available,
-    price: 80.0,
+    price: 8.0,
   },
   {
     product_id: 11,

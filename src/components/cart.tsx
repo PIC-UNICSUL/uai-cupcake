@@ -13,13 +13,17 @@ import {
   SheetTitle,
 } from './ui/sheet'
 
-export function Cart() {
+interface CartProps {
+  onClose: () => void
+}
+
+export function Cart({ onClose }: CartProps) {
   const { cartItems, cartItemsTotal, cartQuantity } = useStore()
 
   const formattedItemsTotal = formatMoney(cartItemsTotal)
 
   return (
-    <SheetContent className="flex w-[400px] flex-col justify-between">
+    <SheetContent className="flex w-[21.5rem] sm:w-[400px] flex-col justify-between">
       <SheetHeader>
         <SheetTitle>Carrinho de compras</SheetTitle>
         <SheetDescription>
@@ -47,7 +51,7 @@ export function Cart() {
               <p className="text-lg font-bold">{formattedItemsTotal}</p>
             </div>
           </div>
-          <Link to="/checkout">
+          <Link to="/checkout" onClick={onClose}>
             <Button className="w-full">Finalizar compra</Button>
           </Link>
         </div>

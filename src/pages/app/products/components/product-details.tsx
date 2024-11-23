@@ -86,10 +86,8 @@ export function ProductDetails({
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <p className="text-sm">
-                    {isScreenLarge && cupcake.description.length > 80
-                      ? cupcake.description.substring(0, 50).concat('...')
-                      : cupcake.description}
+                  <p className="text-sm line-clamp-3 sm:line-clamp-2">
+                    {cupcake.description}
                   </p>
                 </TooltipTrigger>
                 <TooltipContent>

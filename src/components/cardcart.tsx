@@ -50,8 +50,8 @@ export function CardCart({ cartItem }: CupcakeCardCartProps) {
           />
         )}
       </div>
-      <div className="flex w-full justify-between">
-        <div className="flex w-32 flex-col gap-4">
+      <div className="flex w-full">
+        <div className="flex w-24 sm:w-32 flex-col gap-4">
           <p className="overflow-hidden text-ellipsis whitespace-nowrap">
             {cupcake?.name}
           </p>

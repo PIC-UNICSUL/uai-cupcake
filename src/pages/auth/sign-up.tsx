@@ -63,7 +63,9 @@ export function SignUp() {
 
       toast.success('Usuário cadastrado com sucesso!')
       navigate('/sign-in')
-    } catch (error) {
+    } catch (error: any) {
+      // const errorMessage = error.response?.data?.message || 'Erro ao cadastrar usuário';
+      // toast.error(errorMessage);
       toast.error('Erro ao cadastrar usuário')
     }
   }

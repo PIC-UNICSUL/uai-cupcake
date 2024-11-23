@@ -82,7 +82,7 @@ export function NewProduct({ onClose, onAddProduct }: NewProductProps) {
   }
 
   return (
-    <DialogContent>
+    <DialogContent className="mx-3 rounded-lg sm:mx-0">
       <DialogHeader>
         <DialogTitle>Adicionar Cupcake</DialogTitle>
       </DialogHeader>

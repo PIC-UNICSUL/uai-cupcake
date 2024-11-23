@@ -99,7 +99,7 @@ export function ProductEdit({ cupcake, onClose }: ProductEditProps) {
   }
 
   return (
-    <DialogContent>
+    <DialogContent className="mx-3 rounded-lg sm:mx-0">
       <DialogHeader>
         <DialogTitle>Editar Cupcake: {cupcake.name}</DialogTitle>
       </DialogHeader>

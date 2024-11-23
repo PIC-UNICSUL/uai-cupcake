@@ -10,7 +10,7 @@ import {
   ShoppingCart,
   UtensilsCrossed,
 } from 'lucide-react'
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 import { User, userType } from '@/@types/types'
@@ -158,10 +158,14 @@ function CustomerMenu({
   user,
   onPromoteToAdmin,
 }: CustomerMenuProps) {
+  const [isCartOpen, setCartOpen] = useState(false)
+
+  const handleCloseCart = () => setCartOpen(false)
+
   return (
     <>
       <div className="flex justify-center rounded-lg border hover:bg-muted">
-        <Sheet>
+        <Sheet open={isCartOpen} onOpenChange={setCartOpen}>
           <SheetTrigger className="flex items-center gap-2 px-2 py-2">
             <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5" />
             <span
@@ -170,7 +174,7 @@ function CustomerMenu({
               {cartQuantityLabel}
             </span>
           </SheetTrigger>
-          <Cart />
+          <Cart onClose={handleCloseCart} />
         </Sheet>
       </div>
       <div className="hidden sm:block">
