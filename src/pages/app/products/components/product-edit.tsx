@@ -32,11 +32,11 @@ const productEditFormSchema = z.object({
   price: z.string().nonempty('Informe o preço'),
   category: z.string().nonempty('Informe a categoria'),
   img: z
-    .union([z.instanceof(File), z.string().optional()]) // Aceita tanto File quanto string
-    .refine((file) => file instanceof File || file === '', {
-      message: 'Imagem é obrigatória',
-    })
-    .optional(),
+    .union([z.instanceof(File), z.string()])
+    .optional()
+    .refine((value) => value instanceof File || value === '' || value, {
+      message: 'Imagem inválida ou ausente',
+    }),
 })
 
 type ProductEditForm = z.infer<typeof productEditFormSchema>
@@ -57,16 +57,16 @@ export function ProductEdit({ cupcake, onClose }: ProductEditProps) {
       description: cupcake.description,
       price: String(cupcake.price),
       category: cupcake.category,
-      img: cupcake.img || '', // Aqui pode ser uma string, a URL da imagem atual
+      img: cupcake.img || '', // URL da imagem atual
     },
   })
 
   function handleImageChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0]
     if (file) {
-      setValue('img', file) // Define o img como um File
-      const previewUrl = URL.createObjectURL(file) // Cria uma URL para o arquivo selecionado
-      setImagePreview(previewUrl) // Atualiza o estado com a URL da imagem
+      setValue('img', file) // Define o img como File
+      const previewUrl = URL.createObjectURL(file) // Gera uma URL para pré-visualização
+      setImagePreview(previewUrl) // Atualiza a pré-visualização
     }
   }
 
@@ -79,7 +79,9 @@ export function ProductEdit({ cupcake, onClose }: ProductEditProps) {
         product_id: cupcake.product_id,
         price: Number(data.price),
         img:
-          data.img instanceof File ? URL.createObjectURL(data.img) : data.img, // Trata como string ou File
+          data.img instanceof File
+            ? URL.createObjectURL(data.img) // Simula envio de imagem
+            : data.img, // Mantém a URL caso já exista
       }
 
       const errorMessage = updateProduct(dataFormatted)
