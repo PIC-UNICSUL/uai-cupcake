@@ -1,8 +1,10 @@
-import { useState } from 'react'
+import { CirclePlus } from 'lucide-react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
 import { v4 as uuidv4 } from 'uuid'
 
+import { Product } from '@/@types/types'
 import { SelectMenu } from '@/components/menus'
 import { QuantityInput } from '@/components/quantity-input'
 import { Button } from '@/components/ui/button'
@@ -18,20 +20,64 @@ import { ProductDetails } from './components/product-details'
 export function Products() {
   const [quantities, setQuantities] = useState<{ [key: number]: number }>({})
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [filters, setFilters] = useState<string[]>([])
+  const [checkboxState, setCheckboxState] = useState<{
+    [key: string]: boolean
+  }>({})
+  const [sortOption, setSortOption] = useState<string>('padrao')
 
-  const { signed, user, addProductsToCart, products } = useStore()
+  const { signed, user, addProductsToCart, products, addProduct } = useStore()
 
-  function handleIncrease(id: number) {
-    setQuantities((prevState) => ({
+  // Atualizar os filtros ao clicar no checkbox
+  function handleFilterChange(category: string, checked: boolean) {
+    setFilters((prevFilters) =>
+      checked
+        ? [...prevFilters, category]
+        : prevFilters.filter((f) => f !== category),
+    )
+    setCheckboxState((prevState) => ({
       ...prevState,
-      [id]: (prevState[id] || 0) + 1,
+      [category]: checked,
     }))
   }
 
-  function handleDecrease(id: number) {
+  function clearFilters() {
+    setFilters([])
+    setCheckboxState({})
+  }
+
+  const categories = useMemo(() => {
+    const allCategories = products.map((product) => product.category)
+    return Array.from(new Set(allCategories)) // Remove duplicatas
+  }, [products])
+
+  // Atualizar a ordenação ao selecionar uma opção
+  function handleSortChange(value: string) {
+    setSortOption(value)
+  }
+
+  // Filtrar e ordenar produtos
+  const filteredProducts = useMemo(() => {
+    const result = products.filter(
+      (product) =>
+        (filters.length === 0 || filters.includes(product.category)) &&
+        (product.availability_status === 'Disponível' ||
+          user?.user_type === 'admin'),
+    )
+
+    if (sortOption === 'price-asc') {
+      result.sort((a, b) => a.price - b.price)
+    } else if (sortOption === 'price-desc') {
+      result.sort((a, b) => b.price - a.price)
+    }
+
+    return result
+  }, [products, filters, sortOption, user])
+
+  function handleQuantityChange(id: number, type: 'increase' | 'decrease') {
     setQuantities((prevState) => ({
       ...prevState,
-      [id]: Math.max((prevState[id] || 0) - 1, 0),
+      [id]: Math.max((prevState[id] || 0) + (type === 'increase' ? 1 : -1), 0),
     }))
   }
 
@@ -47,16 +93,24 @@ export function Products() {
       }))
 
     if (cupcakesToAdd.length > 0) {
-      addProductsToCart(cupcakesToAdd, user?.email!)
+      addProductsToCart(cupcakesToAdd, user?.email ?? '')
       toast.success('Cupcakes adicionados ao carrinho')
     }
+  }
+
+  function handleAddProduct(
+    newProduct: Omit<Product, 'product_id' | 'availability_status'>,
+  ) {
+    addProduct(newProduct) // Adiciona ao Zustand
+
+    toast.success('Cupcake adicionado com sucesso!')
   }
 
   return (
     <div className="flex min-h-screen flex-col gap-6">
       <div className="w-full md:w-1/3">
         <p className="text-semibold text-xl lg:text-4xl">Todos</p>
-        <p className="text-muted-foreground text-sm md:text-base">
+        <p className="text-sm text-muted-foreground md:text-base">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
           eiusmod tempor incididunt ut labore et dolore magna aliqua.
         </p>
@@ -65,45 +119,48 @@ export function Products() {
       <div className="grid w-full md:grid-cols-[220px_1fr] lg:grid-cols-[450px_1fr]">
         <div>
           <div className="flex items-center gap-4 pb-5">
-            <p className="font-semibold text-sm md:text-base">Filtros</p>
-            <Button variant="link" className="h-1 text-sm md:text-base text-muted-foreground">
+            <p className="text-sm font-semibold md:text-base">Filtros</p>
+            <Button
+              variant="link"
+              className="h-1 text-sm text-muted-foreground md:text-base"
+              onClick={clearFilters} // Limpar filtros
+            >
               Limpar filtros
             </Button>
           </div>
           <div>
             <p className="pb-4 text-xs font-bold">Categorias</p>
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center space-x-2">
-                <Checkbox id="vegano" />
-                <Label htmlFor="vegano" className="text-sm font-medium">
-                  Vegano
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox id="tradicional" />
-                <Label htmlFor="tradicional" className="text-sm font-medium">
-                  Tradicional
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox id="glutenS" />
-                <Label htmlFor="glutenS" className="text-sm font-medium">
-                  Sem glúten
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox id="salgado" />
-                <Label htmlFor="salgado" className="text-sm font-medium">
-                  Salgado
-                </Label>
-              </div>
+            <div className="mb-4 flex flex-col gap-1 sm:mb-0">
+              {categories.map((category) => (
+                <div key={category} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={category}
+                    checked={checkboxState[category] || false}
+                    onCheckedChange={(checked: boolean | string) =>
+                      handleFilterChange(
+                        category,
+                        typeof checked === 'boolean' ? checked : false,
+                      )
+                    }
+                  />
+                  <Label htmlFor={category} className="text-sm font-medium">
+                    {category}
+                  </Label>
+                </div>
+              ))}
               {user?.user_type === 'admin' && (
                 <div className="mt-2">
                   <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                     <DialogTrigger asChild>
-                      <Button>Adicionar novo cupcake</Button>
+                      <Button className="flex gap-2">
+                        <CirclePlus className="h-4 w-4" />
+                        Cupcake
+                      </Button>
                     </DialogTrigger>
-                    <NewProduct onClose={() => setIsModalOpen(false)} />
+                    <NewProduct
+                      onClose={() => setIsModalOpen(false)}
+                      onAddProduct={handleAddProduct}
+                    />
                   </Dialog>
                 </div>
               )}
@@ -116,53 +173,68 @@ export function Products() {
             <div className="pb-11">
               <div className="flex flex-col items-end">
                 <SelectMenu
-                  defaultValue="popular"
+                  defaultValue="padrao"
                   size="large"
-                  prefix="Ordernar por "
+                  prefix="Ordenar por"
+                  onValueChange={handleSortChange}
                 >
-                  <SelectItem value="popular">Popular</SelectItem>
-                  <SelectItem value="item1">Item1</SelectItem>
-                  <SelectItem value="item2">Item2</SelectItem>
-                  <SelectItem value="item3">Item3</SelectItem>
-                  <SelectItem value="item4">Item4</SelectItem>
-                  <SelectItem value="item5">Item5</SelectItem>
+                  <SelectItem value="padrao">Padrão</SelectItem>
+                  <SelectItem value="price-asc">
+                    Preço: Menor para maior
+                  </SelectItem>
+                  <SelectItem value="price-desc">
+                    Preço: Maior para menor
+                  </SelectItem>
                 </SelectMenu>
                 <p className="text-sm">
-                  {products.length} produtos encontrados
+                  {filteredProducts.length} produtos encontrados
                 </p>
               </div>
-              <div className="w-full">
+              {filteredProducts.length === 0 && (
+                <div className="flex h-full items-center justify-center">
+                  <p className="text-2xl font-semibold">
+                    Nenhum produto encontrado
+                  </p>
+                </div>
+              )}
+              <section className="w-full">
                 <div className="flex flex-col gap-4 sm:items-end">
                   <div className="w-full md:w-4/5">
-                    {products.map((cupcake) => {
-                      return (
-                        <ProductDetails
-                          key={cupcake.product_id}
-                          cupcake={cupcake}
-                          quantityInput={
-                            <QuantityInput
-                              quantity={quantities[cupcake.product_id] || 0}
-                              onIncrease={() =>
-                                handleIncrease(cupcake.product_id)
-                              }
-                              onDecrease={() =>
-                                handleDecrease(cupcake.product_id)
-                              }
-                            />
-                          }
-                        />
-                      )
-                    })}
+                    {filteredProducts.map((product) => (
+                      <ProductDetails
+                        key={product.product_id}
+                        cupcake={product}
+                        quantityInput={
+                          <QuantityInput
+                            quantity={quantities[product.product_id] || 0}
+                            onIncrease={() =>
+                              handleQuantityChange(
+                                product.product_id,
+                                'increase',
+                              )
+                            }
+                            onDecrease={() =>
+                              handleQuantityChange(
+                                product.product_id,
+                                'decrease',
+                              )
+                            }
+                          />
+                        }
+                      />
+                    ))}
                   </div>
                   {signed ? (
-                    <div className="w-full text-center">
+                    <div
+                      className={`w-full text-center ${filteredProducts.length === 0 && 'hidden'} `}
+                    >
                       <Button
                         className="w-3/6 transition disabled:cursor-default disabled:opacity-40"
                         disabled={
                           products.filter(
                             (cupcake) =>
                               (quantities[cupcake.product_id] || 0) > 0,
-                          ).length == 0
+                          ).length === 0
                         }
                         variant="outline"
                         onClick={handleAddToCart}
@@ -181,7 +253,7 @@ export function Products() {
                     </Link>
                   )}
                 </div>
-              </div>
+              </section>
             </div>
           </div>
         ) : (

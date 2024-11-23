@@ -10,6 +10,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useStore } from '@/store'
+// import { useMutation } from '@tanstack/react-query'
+// import { signUp } from '@/api/sign-up'
 
 const signUpFormSchema = z.object({
   name: z
@@ -44,9 +46,13 @@ export function SignUp() {
     resolver: zodResolver(signUpFormSchema),
   })
 
+  // const { mutateAsync: newAccount } = useMutation({
+  //   mutationFn: signUp,
+  // })
+
   async function handleSignUp(data: SignUpForm) {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000))
+      // await newAccount({ name: data.name, email: data.email, password: data.password_hash, phone: data.phone })
 
       const errorMessage = signup(data)
 
@@ -57,7 +63,9 @@ export function SignUp() {
 
       toast.success('Usuário cadastrado com sucesso!')
       navigate('/sign-in')
-    } catch (error) {
+    } catch (error: any) {
+      // const errorMessage = error.response?.data?.message || 'Erro ao cadastrar usuário';
+      // toast.error(errorMessage);
       toast.error('Erro ao cadastrar usuário')
     }
   }
@@ -65,7 +73,7 @@ export function SignUp() {
   return (
     <>
       <Helmet title="Sign Up" />
-      <div className="py-8 px-2 lg:px-0">
+      <div className="px-2 py-8 lg:px-0">
         <div className="flex max-w-80 flex-col justify-center gap-6">
           <div className="flex flex-col gap-2 text-center">
             <h1 className="text-2xl font-semibold tracking-tight">

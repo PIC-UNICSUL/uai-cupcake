@@ -1,10 +1,10 @@
 import { Trash2 } from 'lucide-react'
 
 import { OrderItems, Product } from '@/@types/types'
+import { formatMoney } from '@/pages/app/products/components/product-details'
 import { useStore } from '@/store'
 
 import { QuantityInput } from './quantity-input'
-import { formatMoney } from '@/pages/app/products/components/product-details'
 
 interface CupcakeCardCartProps {
   cartItem: OrderItems
@@ -18,15 +18,23 @@ export function CardCart({ cartItem }: CupcakeCardCartProps) {
   ) as Product
 
   function handleIncrease() {
-    changeCartItemQuantity(cartItem.order_item_id, 'increase', user?.email!)
+    changeCartItemQuantity(
+      cartItem.order_item_id,
+      'increase',
+      user?.email ?? '',
+    )
   }
 
   function handleDecrease() {
-    changeCartItemQuantity(cartItem.order_item_id, 'decrease', user?.email!)
+    changeCartItemQuantity(
+      cartItem.order_item_id,
+      'decrease',
+      user?.email ?? '',
+    )
   }
 
   function handleRemove() {
-    removeCartItem(cartItem.order_item_id, user?.email!)
+    removeCartItem(cartItem.order_item_id, user?.email ?? '')
   }
 
   const formattedPrice = formatMoney(cupcake?.price * cartItem.quantity)
@@ -42,8 +50,8 @@ export function CardCart({ cartItem }: CupcakeCardCartProps) {
           />
         )}
       </div>
-      <div className="flex w-full justify-between">
-        <div className="flex w-32 flex-col gap-4">
+      <div className="flex w-full">
+        <div className="flex w-24 sm:w-32 flex-col gap-4">
           <p className="overflow-hidden text-ellipsis whitespace-nowrap">
             {cupcake?.name}
           </p>

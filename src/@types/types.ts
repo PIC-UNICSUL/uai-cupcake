@@ -80,7 +80,7 @@ export interface CartState {
   changeCartItemQuantity: (
     cartItemId: number,
     type: 'increase' | 'decrease',
-    email: string
+    email: string,
   ) => void
   removeCartItem: (cartItemId: number, email: string) => void
   cleanCart: (email: string) => void

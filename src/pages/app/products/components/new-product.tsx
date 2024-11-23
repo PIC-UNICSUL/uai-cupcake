@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
+import { Product } from '@/@types/types'
 import { Button } from '@/components/ui/button'
 import {
   DialogContent,
@@ -14,9 +15,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { useStore } from '@/store'
 
-// Schema de validação usando Zod
 const newCupcakeFormSchema = z.object({
   name: z
     .string()
@@ -33,14 +32,16 @@ const newCupcakeFormSchema = z.object({
   }),
 })
 
-// Tipo inferido a partir do esquema de validação
 type NewCupcakeForm = z.infer<typeof newCupcakeFormSchema>
 
 interface NewProductProps {
-  onClose: () => void // Função para fechar o modal
+  onClose: () => void
+  onAddProduct: (
+    newProduct: Omit<Product, 'product_id' | 'availability_status'>,
+  ) => void
 }
 
-export function NewProduct({ onClose }: NewProductProps) {
+export function NewProduct({ onClose, onAddProduct }: NewProductProps) {
   const {
     register,
     handleSubmit,
@@ -49,7 +50,6 @@ export function NewProduct({ onClose }: NewProductProps) {
   } = useForm<NewCupcakeForm>({
     resolver: zodResolver(newCupcakeFormSchema),
   })
-  const { addProduct } = useStore()
 
   const [imagePreview, setImagePreview] = useState<string | null>(null)
 
@@ -66,22 +66,15 @@ export function NewProduct({ onClose }: NewProductProps) {
   // Função chamada ao submeter o formulário
   async function handleNewProduct(data: NewCupcakeForm) {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-
       const newProduct = {
         ...data,
+        category: data.category,
         price: parseFloat(data.price.replace(',', '.')),
         img: data.img ? URL.createObjectURL(data.img) : '',
       }
 
-      const errorMessage = addProduct(newProduct)
-
-      if (typeof errorMessage === 'string') {
-        toast.error(errorMessage)
-        return
-      }
-
-      toast.success('Produto cadastrado com sucesso!')
+      // const errorMessage = addProduct(newProduct)
+      onAddProduct(newProduct)
       onClose()
     } catch (error) {
       toast.error('Erro ao cadastrar produto')
@@ -89,7 +82,7 @@ export function NewProduct({ onClose }: NewProductProps) {
   }
 
   return (
-    <DialogContent>
+    <DialogContent className="mx-3 rounded-lg sm:mx-0">
       <DialogHeader>
         <DialogTitle>Adicionar Cupcake</DialogTitle>
       </DialogHeader>

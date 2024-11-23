@@ -11,8 +11,8 @@ export function Contact() {
             Fale conosco
           </h1>
           <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            Entre em contato conosco para tirar dúvidas, compartilhar sugestões
+            ou resolver quaisquer questões. Estamos aqui para ajudar!
           </p>
         </div>
 

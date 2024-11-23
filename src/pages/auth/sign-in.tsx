@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useStore } from '@/store'
+// import { useMutation } from '@tanstack/react-query'
+// import { signIn } from '@/api/sign-in'
 
 const signInSchema = z.object({
   email: z
@@ -38,16 +40,21 @@ export function SignIn() {
     },
   })
 
-  async function handleAuthenticate({ email, password }: SignInSchema) {
+  // const { mutateAsync: authenticate } = useMutation({
+  //   mutationFn: signIn,
+  // })
+
+  async function handleAuthenticate(data: SignInSchema) {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-      const errorMessage = signin(email, password)
+      // await authenticate({ email: data.email, password: data.password })
+      const errorMessage = signin(data.email, data.password)
 
       if (typeof errorMessage === 'string') {
         toast.error(errorMessage)
         return
       }
-      loadCartForUser(email)
+
+      loadCartForUser(data.email)
       navigate('/')
     } catch (err) {
       toast.error('Credenciais inválidas')

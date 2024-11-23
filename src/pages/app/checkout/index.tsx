@@ -25,7 +25,7 @@ export function Checkout() {
     if (cartItems.length > 0) {
       if (!user) return
       addOrder(user, cartItems, cartItemsTotal)
-      cleanCart()
+      cleanCart(user?.email)
 
       navigate('/orders')
     }

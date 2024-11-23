@@ -11,24 +11,22 @@ interface ProductDetails {
 }
 
 export function ProductsCheckout({ cupcake }: ProductDetails) {
-  const { removeCartItem } = useStore()
+  const { removeCartItem, user } = useStore()
 
   const formattedPrice = formatMoney(cupcake.price)
 
   function handleRemove() {
-    removeCartItem(cupcake.order_item_id)
+    removeCartItem(cupcake.order_item_id, user?.email ?? '')
   }
 
   return (
-    <div className="flex w-[98%] items-end justify-between rounded-lg border bg-card p-2 shadow-sm">
+    <div className="flex h-36 w-[98%] items-end justify-between rounded-lg border bg-card p-2 shadow-sm">
       <div className="flex gap-3">
         <img src={cupcake.img} alt="" className="h-32 min-w-[150px] rounded" />
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col justify-between">
           <p className="text-lg font-semibold">{cupcake.name}</p>
-          <p className="text-sm">
-            {cupcake.description.length > 60
-              ? cupcake.description.substring(0, 60).concat('...')
-              : cupcake.description}
+          <p className="text-sm line-clamp-2">
+            {cupcake.description}
           </p>
           <p className="text-sm font-semibold">
             Quantidade: <span>{cupcake.quantity}</span>
@@ -41,7 +39,7 @@ export function ProductsCheckout({ cupcake }: ProductDetails) {
           <Button
             variant="destructive"
             title="Remover do carrinho"
-            className="p-6"
+            className="p-2 sm:p-6"
             onClick={handleRemove}
           >
             <Trash2 className="h-5 w-5" />

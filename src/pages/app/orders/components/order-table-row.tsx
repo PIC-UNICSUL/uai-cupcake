@@ -1,64 +1,87 @@
-import { Search } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { Search } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 
-import { Order, OrderItems } from '@/@types/types';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogTrigger } from '@/components/ui/dialog';
-import { TableCell, TableRow } from '@/components/ui/table';
-import { useStore } from '@/store';
-import { formatOrderDate } from '@/utils/date-utils';
-import { formatMoney } from '../../products/components/product-details';
-import { OrderDetails } from './order-details';
+import { Order, OrderItems } from '@/@types/types'
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogTrigger } from '@/components/ui/dialog'
+import { TableCell, TableRow } from '@/components/ui/table'
+import { useStore } from '@/store'
+import { formatOrderDate } from '@/utils/date-utils'
+
+import { formatMoney } from '../../products/components/product-details'
+import { OrderDetails } from './order-details'
 
 interface OrderTableRowProps {
-  order: Order;
+  order: Order
 }
 
 interface UserProps {
-  email: string;
-  name: string;
-  phone: string;
+  email: string
+  name: string
+  phone: string
 }
 
 export function OrderTableRow({ order }: OrderTableRowProps) {
-  const [orderItems, setOrderItems] = useState<OrderItems[]>([]);
-  const [buyer, setBuyer] = useState<UserProps | null>(null);
+  const [orderItems, setOrderItems] = useState<OrderItems[]>([])
+  const [buyer, setBuyer] = useState<UserProps | null>(null)
 
-  const { user, fetchUsers, fetchAllOrderItems } = useStore();
+  const { user, fetchUsers, fetchAllOrderItems } = useStore()
 
-  const formattedPrice = useMemo(() => formatMoney(order.price), [order.price]);
-  const statusColor = useMemo(() => getStatusColor(order.status), [order.status]);
+  const formattedPrice = useMemo(() => formatMoney(order.price), [order.price])
+  const statusColor = useMemo(
+    () => getStatusColor(order.status),
+    [order.status],
+  )
 
   useEffect(() => {
-    const items = fetchAllOrderItems(order.order_id);
-    const userDetails = fetchUsers().find((u) => u.user_id === order.user_id) || null;
+    const items = fetchAllOrderItems(order.order_id)
+    const userDetails =
+      fetchUsers().find((u) => u.user_id === order.user_id) || null
 
-    setBuyer(userDetails ? { email: userDetails.email, name: userDetails.name, phone: userDetails.phone } : null);
-    setOrderItems(items);
-  }, [order.order_id, fetchUsers]);
+    setBuyer(
+      userDetails
+        ? {
+            email: userDetails.email,
+            name: userDetails.name,
+            phone: userDetails.phone,
+          }
+        : null,
+    )
+    setOrderItems(items)
+  }, [order.order_id, fetchUsers])
 
-  const totalQuantity = useMemo(() => orderItems.reduce((sum, item) => sum + item.quantity, 0), [orderItems]);
+  const totalQuantity = useMemo(
+    () => orderItems.reduce((sum, item) => sum + item.quantity, 0),
+    [orderItems],
+  )
 
   const renderBuyerDetails = () => {
     if (user?.user_type === 'admin') {
-      return (
-        <TableCell className="font-medium">{buyer?.email}</TableCell>
-      );
+      return <TableCell className="font-medium">{buyer?.email}</TableCell>
     }
-    return null;
-  };
+    return null
+  }
 
   return (
-    <TableRow className="cursor-pointer">
-      <TableCell className="font-mono text-xs font-medium">{order.order_id}</TableCell>
+    <TableRow className="min-w-[600px] cursor-pointer">
+      <TableCell className="font-mono text-xs font-medium">
+        {order.order_id}
+      </TableCell>
       {renderBuyerDetails()}
       <TableCell className="font-medium">{totalQuantity}</TableCell>
       <TableCell className="font-medium">{formattedPrice}</TableCell>
-      <TableCell className="text-muted-foreground">{formatOrderDate(order.created_at)}</TableCell>
+      <TableCell className="text-muted-foreground">
+        {formatOrderDate(order.created_at)}
+      </TableCell>
       <TableCell>
         <div className="flex items-center gap-1">
-          <span className={`h-2 w-2 rounded-full ${statusColor}`} aria-hidden="true"></span>
-          <span className="font-medium text-muted-foreground">{order.status}</span>
+          <span
+            className={`h-2 w-2 rounded-full ${statusColor}`}
+            aria-hidden="true"
+          ></span>
+          <span className="font-medium text-muted-foreground">
+            {order.status}
+          </span>
         </div>
       </TableCell>
       <TableCell>
@@ -74,6 +97,7 @@ export function OrderTableRow({ order }: OrderTableRowProps) {
             total={formattedPrice}
             date={formatOrderDate(order.created_at)}
             status={order.status}
+            updatedDate={order.updated_at}
             buyerEmail={buyer?.email}
             buyerName={buyer?.name}
             buyerPhone={buyer?.phone}
@@ -82,7 +106,7 @@ export function OrderTableRow({ order }: OrderTableRowProps) {
         </Dialog>
       </TableCell>
     </TableRow>
-  );
+  )
 }
 
 function getStatusColor(status: string): string {
@@ -91,6 +115,6 @@ function getStatusColor(status: string): string {
     Preparando: 'bg-yellow-400',
     Pronto: 'bg-green-400',
     Cancelado: 'bg-red-400',
-  };
-  return statusColors[status] || 'hidden';
+  }
+  return statusColors[status] || 'hidden'
 }
