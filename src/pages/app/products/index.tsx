@@ -1,4 +1,10 @@
-import { CirclePlus } from 'lucide-react'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@radix-ui/react-tooltip'
+import { CirclePlus, Plus, ShoppingCart } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
@@ -108,15 +114,11 @@ export function Products() {
 
   return (
     <div className="flex min-h-screen flex-col gap-6">
-      <div className="w-full md:w-1/3">
-        <p className="text-semibold text-xl lg:text-4xl">Todos</p>
-        <p className="text-sm text-muted-foreground md:text-base">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-          eiusmod tempor incididunt ut labore et dolore magna aliqua.
-        </p>
+      <div className="w-full">
+        <p className="text-semibold text-xl md:text-4xl">Todos</p>
       </div>
 
-      <div className="grid w-full md:grid-cols-[220px_1fr] lg:grid-cols-[450px_1fr]">
+      <div className="grid w-full md:grid-cols-[320px_1fr]">
         <div>
           <div className="flex items-center gap-4 pb-5">
             <p className="text-sm font-semibold md:text-base">Filtros</p>
@@ -198,7 +200,7 @@ export function Products() {
                 </div>
               )}
               <section className="w-full">
-                <div className="flex flex-col gap-4 sm:items-end">
+                <div className="flex flex-col gap-4">
                   <div className="w-full md:w-4/5">
                     {filteredProducts.map((product) => (
                       <ProductDetails
@@ -228,19 +230,28 @@ export function Products() {
                     <div
                       className={`w-full text-center ${filteredProducts.length === 0 && 'hidden'} `}
                     >
-                      <Button
-                        className="w-3/6 transition disabled:cursor-default disabled:opacity-40"
-                        disabled={
-                          products.filter(
-                            (cupcake) =>
-                              (quantities[cupcake.product_id] || 0) > 0,
-                          ).length === 0
-                        }
-                        variant="outline"
-                        onClick={handleAddToCart}
-                      >
-                        Adicionar ao carrinho
-                      </Button>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              className="fixed bottom-16 right-16 rounded-full transition disabled:opacity-40"
+                              disabled={
+                                products.filter(
+                                  (cupcake) =>
+                                    (quantities[cupcake.product_id] || 0) > 0,
+                                ).length === 0
+                              }
+                              onClick={handleAddToCart}
+                            >
+                              <Plus className="h-4 w-4" />{' '}
+                              <ShoppingCart className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent className="mb-3">
+                            <p>Adicionar ao carrinho</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </div>
                   ) : (
                     <Link

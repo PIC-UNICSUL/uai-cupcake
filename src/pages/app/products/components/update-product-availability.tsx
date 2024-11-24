@@ -26,9 +26,7 @@ export function UpdateProductAvailability({
 
   const isAvailable = newStatus === productStatus.available
   const actionText = isAvailable ? 'disponível' : 'indisponível'
-  const buttonText = isAvailable
-    ? 'Deixar disponível'
-    : 'Deixar indisponível'
+  const buttonText = isAvailable ? 'Deixar disponível' : 'Deixar indisponível'
   const successMessage = `Status do produto alterado para ${actionText} com sucesso`
   const errorMessage = `Erro ao alterar o status do produto para ${actionText}`
 
@@ -48,7 +46,7 @@ export function UpdateProductAvailability({
   }
 
   return (
-    <DialogContent className="mx-3 rounded-lg sm:mx-0">
+    <DialogContent className="ml-3 rounded-lg sm:mx-0">
       <DialogHeader className="text-left">
         <DialogTitle>Alteração de disponibilidade</DialogTitle>
         <button
@@ -69,7 +67,12 @@ export function UpdateProductAvailability({
 
       <div className="flex gap-2 sm:gap-5">
         {!isAvailable && (
-          <Button variant="secondary" type="button" onClick={onClose} className="h-8 sm:h-10">
+          <Button
+            variant="secondary"
+            type="button"
+            onClick={onClose}
+            className="h-8 sm:h-10"
+          >
             Não, quero voltar
           </Button>
         )}

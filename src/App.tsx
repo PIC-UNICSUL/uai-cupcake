@@ -24,7 +24,7 @@ export function App() {
       <QueryClientProvider client={queryClient}>
         <RouterProvider router={router} />
       </QueryClientProvider>
-      <Toaster richColors />
+      <Toaster richColors duration={1500} position="top-right" />
     </HelmetProvider>
   )
 }
