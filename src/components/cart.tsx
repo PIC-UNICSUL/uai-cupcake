@@ -23,7 +23,7 @@ export function Cart({ onClose }: CartProps) {
   const formattedItemsTotal = formatMoney(cartItemsTotal)
 
   return (
-    <SheetContent className="flex w-[21.5rem] sm:w-[400px] flex-col justify-between">
+    <SheetContent className="flex w-[21.5rem] flex-col justify-between sm:w-[400px]">
       <SheetHeader>
         <SheetTitle>Carrinho de compras</SheetTitle>
         <SheetDescription>

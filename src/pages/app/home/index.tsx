@@ -1,9 +1,10 @@
 import { Helmet } from 'react-helmet-async'
 import { Link } from 'react-router-dom'
 
+import { productStatus } from '@/@types/types'
 import { Header } from '@/components/header'
 import { Button } from '@/components/ui/button'
-import { Cupcakes } from '@/mock/Cupcakes'
+import useWindowSize from '@/hooks/useWindowSize'
 import { useStore } from '@/store'
 
 import { formatMoney } from '../products/components/product-details'
@@ -11,6 +12,15 @@ import { CardProduct } from './components/card'
 
 export function Home() {
   const { products } = useStore()
+  const { width } = useWindowSize()
+
+  // Define o número de cupcakes a serem exibidos
+  const cupcakesToShow = width < 768 ? 2 : 3
+
+  // Filtra produtos disponíveis
+  const availableProducts = products.filter(
+    (product) => product.availability_status === productStatus.available,
+  )
 
   return (
     <>
@@ -38,9 +48,10 @@ export function Home() {
               </Link>
             </div>
 
-            {products.length > 0 && (
+            {/* Exibe cupcakes disponíveis */}
+            {availableProducts.length > 0 && (
               <div className="flex w-full justify-center space-x-4 pb-12 pt-6">
-                {Cupcakes.slice(1, 4).map((cupcake) => (
+                {availableProducts.slice(0, cupcakesToShow).map((cupcake) => (
                   <CardProduct
                     key={cupcake.product_id}
                     img={cupcake.img}
@@ -55,8 +66,8 @@ export function Home() {
               <p className="px-4 pb-1 text-2xl font-bold sm:text-3xl md:pb-6 md:text-4xl">
                 Nossa historia
               </p>
-              <div className="flex justify-between text-sm sm:text-base">
-                <div className="w-1/2 p-4 ">
+              <div className="flex flex-col text-sm sm:flex-row sm:justify-between sm:text-base">
+                <div className="px-4 pb-2 sm:w-1/2 sm:p-4 ">
                   <p>
                     A nossa loja começou com uma simples paixão por doces e um
                     sonho de espalhar alegria através dos cupcakes. Cada receita
@@ -64,7 +75,7 @@ export function Home() {
                     única em cada mordida.
                   </p>
                 </div>
-                <div className="w-1/2 p-4">
+                <div className="px-4 sm:w-1/2 sm:p-4">
                   <p>
                     Desde o início, focamos em usar os melhores ingredientes e
                     preparar cada cupcake artesanalmente. Hoje, nos orgulhamos

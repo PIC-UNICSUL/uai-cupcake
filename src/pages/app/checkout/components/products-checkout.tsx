@@ -25,9 +25,7 @@ export function ProductsCheckout({ cupcake }: ProductDetails) {
         <img src={cupcake.img} alt="" className="h-32 min-w-[150px] rounded" />
         <div className="flex flex-col justify-between">
           <p className="text-lg font-semibold">{cupcake.name}</p>
-          <p className="text-sm line-clamp-2">
-            {cupcake.description}
-          </p>
+          <p className="line-clamp-2 text-sm">{cupcake.description}</p>
           <p className="text-sm font-semibold">
             Quantidade: <span>{cupcake.quantity}</span>
           </p>

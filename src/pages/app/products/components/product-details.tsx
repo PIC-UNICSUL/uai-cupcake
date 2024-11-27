@@ -48,30 +48,26 @@ export function ProductDetails({
     user?.user_type,
   )
 
-  const isScreenLarge = width > 767
+  // const isScreenLarge = width > 767
   const isScreenMedium = width > 639
 
   return (
     <div className="relative mt-4 w-full rounded-lg border bg-card p-4 shadow-sm">
-      <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div className="flex flex-col items-start gap-4 sm:flex-row sm:justify-between">
         <div
-          className={`flex flex-col items-center gap-4 sm:h-28 sm:flex-row sm:gap-3 ${unavailable ? 'cursor-not-allowed opacity-40' : ''}`}
+          className={`flex w-full flex-col items-center gap-4 sm:h-28 sm:flex-row sm:gap-3 ${unavailable ? 'cursor-not-allowed opacity-40' : ''}`}
         >
           <img
             src={cupcake.img}
             alt={`${cupcake.name} - Imagem do cupcake`}
             className="h-28 w-28 rounded-md object-cover sm:h-full sm:min-w-24 sm:max-w-24"
           />
-          <div className="flex flex-col justify-between gap-1">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <div className="flex w-full flex-col items-stretch justify-between gap-1">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <TooltipProvider>
                 <Tooltip>
-                  <TooltipTrigger asChild className="md:max-w-28">
-                    <p className="text-lg font-semibold">
-                      {isScreenLarge && cupcake.name.length > 12
-                        ? cupcake.name.substring(0, 12).concat('...')
-                        : cupcake.name}
-                    </p>
+                  <TooltipTrigger asChild>
+                    <p className="text-lg font-semibold">{cupcake.name}</p>
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>{cupcake.name}</p>
@@ -79,14 +75,14 @@ export function ProductDetails({
                 </Tooltip>
               </TooltipProvider>
 
-              <div className="min-w-20 max-w-28">
+              <div className="overflow-hidden text-ellipsis whitespace-nowrap">
                 <Badge className="text-sm">{cupcake.category}</Badge>
               </div>
             </div>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <p className="text-sm line-clamp-3 sm:line-clamp-2">
+                  <p className="line-clamp-3 text-sm sm:line-clamp-2">
                     {cupcake.description}
                   </p>
                 </TooltipTrigger>

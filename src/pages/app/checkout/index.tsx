@@ -52,7 +52,7 @@ export function Checkout() {
       <Helmet title="Checkout" />
       {cartItems.length > 0 ? (
         <div className="container relative flex min-h-screen flex-col-reverse p-0 antialiased lg:grid lg:max-w-none lg:grid-cols-2">
-          <div className="relative flex h-full w-full flex-col py-10 text-muted-foreground lg:w-2/3 lg:p-10">
+          <div className="relative flex h-full w-full flex-col py-10 text-muted-foreground lg:p-10">
             <div className="flex h-full w-full flex-col gap-3 text-foreground">
               <span className="mb-1 text-3xl font-bold lg:mb-4 lg:text-5xl">
                 Retirada
