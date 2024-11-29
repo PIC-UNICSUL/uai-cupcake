@@ -10,6 +10,7 @@ import { formatOrderDate } from '@/utils/date-utils'
 
 import { formatMoney } from '../../products/components/product-details'
 import { OrderDetails } from './order-details'
+import { useAuth } from '@/contexts/auth-context'
 
 interface OrderTableRowProps {
   order: Order
@@ -26,6 +27,7 @@ export function OrderTableRow({ order }: OrderTableRowProps) {
   const [buyer, setBuyer] = useState<UserProps | null>(null)
 
   const { user, fetchUsers, fetchAllOrderItems } = useStore()
+  const { role } = useAuth()
 
   const formattedPrice = useMemo(() => formatMoney(order.price), [order.price])
   const statusColor = useMemo(
@@ -56,7 +58,7 @@ export function OrderTableRow({ order }: OrderTableRowProps) {
   )
 
   const renderBuyerDetails = () => {
-    if (user?.user_type === 'admin') {
+    if (role === 'ADMIN') {
       return <TableCell className="font-medium">{buyer?.email}</TableCell>
     }
     return null
@@ -88,7 +90,7 @@ export function OrderTableRow({ order }: OrderTableRowProps) {
         <Dialog>
           <DialogTrigger asChild>
             <Button variant="outline" size="sm">
-              <Search className="h-5 w-4" />
+              <Search className="w-4 h-5" />
             </Button>
           </DialogTrigger>
           <OrderDetails

@@ -23,11 +23,13 @@ import { NavLink } from './nav-link'
 import { Button } from './ui/button'
 import { Separator } from './ui/separator'
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet'
+import { useAuth } from '@/contexts/auth-context'
 
 export function Header() {
-  const { signed, user, signout, promoteToAdmin, cartQuantity, cartItems } =
+  const {user, signout, promoteToAdmin, cartQuantity, cartItems } =
     useStore()
 
+  const { isAuthenticated, role, logout} = useAuth();
   const navigate = useNavigate()
 
   const handlePromoteToAdmin = useCallback(() => {
@@ -35,9 +37,9 @@ export function Header() {
   }, [user, promoteToAdmin])
 
   const handleSignOut = useCallback(() => {
-    signout()
+    logout()
     navigate('/')
-  }, [signout, navigate])
+  }, [logout, navigate])
 
   const cartQuantityLabel = useMemo(
     () => (cartQuantity > 0 ? cartItems.length : ''),
@@ -45,22 +47,23 @@ export function Header() {
   )
 
   return (
-    <header className="fixed z-10 w-full border-b bg-white">
-      <div className="lg-gap-6 flex h-16 items-center justify-between gap-4 px-6">
-        <Logo className="hidden h-6 w-6 fill-foreground sm:block" />
+    <header className="fixed z-10 w-full bg-white border-b">
+      <div className="flex items-center justify-between h-16 gap-4 px-6 lg-gap-6">
+        <Logo className="hidden w-6 h-6 fill-foreground sm:block" />
         <Separator orientation="vertical" className="hidden h-6 sm:block" />
 
         {/* Links de Navegação */}
         <NavigationLinks />
 
         {/* Área de Ações do Usuário */}
-        <div className="-mr-4 ml-auto flex items-center sm:-mr-0 sm:gap-1 sm:space-x-2">
-          {signed ? (
+        <div className="flex items-center ml-auto -mr-4 sm:-mr-0 sm:gap-1 sm:space-x-2">
+          {isAuthenticated ? (
             <UserMenu
               user={user}
               cartQuantityLabel={cartQuantityLabel}
               onSignOut={handleSignOut}
               onPromoteToAdmin={handlePromoteToAdmin}
+              role={role}
             />
           ) : (
             <GuestMenu />
@@ -79,15 +82,15 @@ function NavigationLinks() {
   return (
     <nav className="flex items-center space-x-2 sm:space-x-4 lg:space-x-6">
       <NavLink to="/">
-        <Home className="h-4 w-4" />
+        <Home className="w-4 h-4" />
         Início
       </NavLink>
       <NavLink to="/products">
-        <UtensilsCrossed className="h-4 w-4" />
+        <UtensilsCrossed className="w-4 h-4" />
         Cupcakes
       </NavLink>
       <NavLink to="/contact">
-        <Mail className="h-4 w-4" />
+        <Mail className="w-4 h-4" />
         Contato
       </NavLink>
     </nav>
@@ -108,6 +111,7 @@ interface UserMenuProps {
   cartQuantityLabel: number | ''
   onSignOut: () => void
   onPromoteToAdmin: () => void
+  role: string | null
 }
 
 function AdminMenu({ onSignOut }: { onSignOut: () => void }) {
@@ -131,10 +135,11 @@ function UserMenu({
   cartQuantityLabel,
   onSignOut,
   onPromoteToAdmin,
+  role
 }: UserMenuProps) {
   return (
     <>
-      {user?.user_type === userType.admin ? (
+      {role === 'ADMIN' ? (
         <AdminMenu onSignOut={onSignOut} />
       ) : (
         <CustomerMenu
@@ -164,10 +169,10 @@ function CustomerMenu({
 
   return (
     <>
-      <div className="flex justify-center rounded-lg border hover:bg-muted">
+      <div className="flex justify-center border rounded-lg hover:bg-muted">
         <Sheet open={isCartOpen} onOpenChange={setCartOpen}>
           <SheetTrigger className="flex items-center gap-2 px-2 py-2">
-            <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5" />
+            <ShoppingCart className="w-4 h-4 sm:h-5 sm:w-5" />
             <span
               className={`text-xs font-semibold sm:text-sm ${cartQuantityLabel === 0 && 'hidden'}`}
             >
@@ -199,36 +204,38 @@ interface MobileMenuProps {
 }
 
 function MobileMenu({ onPromoteToAdmin }: MobileMenuProps) {
-  const { signed, user, signout } = useStore()
+  const { user, signout } = useStore()
+  const { isAuthenticated,  role, logout} = useAuth();
   const navigate = useNavigate()
+ 
 
   const handleSignOut = useCallback(() => {
-    signout()
+    logout()
     navigate('/')
-  }, [signout, navigate])
+  }, [logout, navigate])
 
   return (
     <div className="sm:hidden">
       <Sheet>
         <SheetTrigger asChild>
           <Button variant="ghost" className="p-2">
-            <Menu className="h-6 w-6" />
+            <Menu className="w-6 h-6" />
           </Button>
         </SheetTrigger>
         <SheetContent side="right" className="w-[200px] p-4">
           <nav className="flex flex-col space-y-4">
-            {signed ? (
+            {isAuthenticated ? (
               <>
-                <div className="flex w-full flex-col">
+                <div className="flex flex-col w-full">
                   <span className="overflow-hidden text-ellipsis whitespace-nowrap">
                     {user?.name}
                   </span>
-                  <span className="overflow-hidden text-ellipsis whitespace-nowrap text-xs font-normal text-muted-foreground">
+                  <span className="overflow-hidden text-xs font-normal text-ellipsis whitespace-nowrap text-muted-foreground">
                     {user?.email}
                   </span>
                 </div>
                 <Separator />
-                {user?.user_type === userType.admin ? (
+                {role === 'ADMIN' ? (
                   <>
                     <NavLink to="/orders">Pedidos</NavLink>
                     <div>
@@ -245,26 +252,13 @@ function MobileMenu({ onPromoteToAdmin }: MobileMenuProps) {
                 ) : (
                   <>
                     <Link to="/orders" className="flex items-center gap-2">
-                      <List className="h-4 w-4" />
+                      <List className="w-4 h-4" />
                       <span>Meus pedidos</span>
                     </Link>
                     <Link to="/profile" className="flex items-center">
-                      <Contact className="mr-2 h-4 w-4" />
+                      <Contact className="w-4 h-4 mr-2" />
                       <span>Meus dados</span>
                     </Link>
-                    {user?.email === 'admin@email.com' && (
-                      <div>
-                        <Button
-                          size="custom"
-                          variant="ghost"
-                          onClick={onPromoteToAdmin}
-                          className="p-2"
-                        >
-                          Admin
-                        </Button>
-                      </div>
-                    )}
-
                     <div>
                       <Button
                         className="text-rose-500 dark:text-rose-400"
@@ -272,7 +266,7 @@ function MobileMenu({ onPromoteToAdmin }: MobileMenuProps) {
                         variant="ghost"
                         onClick={handleSignOut}
                       >
-                        <LogOut className="mr-2 h-4 w-4" />
+                        <LogOut className="w-4 h-4 mr-2" />
                         <span>Sair</span>
                       </Button>
                     </div>
@@ -282,11 +276,11 @@ function MobileMenu({ onPromoteToAdmin }: MobileMenuProps) {
             ) : (
               <>
                 <NavLink to="/sign-in">
-                  <CircleUserRound className="h-4 w-4" />
+                  <CircleUserRound className="w-4 h-4" />
                   Entrar
                 </NavLink>
                 <NavLink to="/sign-up">
-                  <PlusCircle className="h-4 w-4" />
+                  <PlusCircle className="w-4 h-4" />
                   Cadastrar
                 </NavLink>
               </>

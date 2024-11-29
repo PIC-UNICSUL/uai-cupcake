@@ -1,10 +1,10 @@
+import { useAuth } from '@/contexts/auth-context';
 import { NotFound } from '@/pages/404'
-import { useStore } from '@/store'
 
 export function RequireAuth({ children }: { children: JSX.Element }) {
-  const { user } = useStore()
+  const { isAuthenticated , role} = useAuth();
 
-  if (!user || user.user_type === 'admin') {
+  if (!isAuthenticated || role === 'ADMIN') {
     return <NotFound />
   }
 

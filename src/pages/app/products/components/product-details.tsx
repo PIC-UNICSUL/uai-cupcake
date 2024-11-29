@@ -1,35 +1,36 @@
-import { Edit, Eye, EyeOff } from 'lucide-react'
-import { ReactNode, useState } from 'react'
+import { Edit, Eye, EyeOff } from 'lucide-react';
+import { ReactNode, useState } from 'react';
 
-import { Product, productStatus } from '@/@types/types'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Dialog, DialogTrigger } from '@/components/ui/dialog'
+import { Product, productStatus } from '@/@types/types';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogTrigger } from '@/components/ui/dialog';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip'
-import useWindowSize from '@/hooks/useWindowSize'
-import { useStore } from '@/store'
+} from '@/components/ui/tooltip';
+import useWindowSize from '@/hooks/useWindowSize';
+import { useStore } from '@/store';
 
-import { ProductEdit } from './product-edit'
-import { UpdateProductAvailability } from './update-product-availability'
+import { ProductEdit } from './product-edit';
+import { UpdateProductAvailability } from './update-product-availability';
+import { useAuth } from '@/contexts/auth-context';
 
 export const formatMoney = (value: number): string =>
   value.toLocaleString('pt-BR', {
     style: 'currency',
     currency: 'BRL',
     minimumFractionDigits: 2,
-  })
+  });
 
 const isUnavailable = (status: string, userType: string | undefined): boolean =>
-  status === 'Indisponível' && userType === 'admin'
+  status === 'Indisponível' && userType === 'admin';
 
 interface ProductDetailsProps {
-  cupcake: Product
-  quantityInput: ReactNode
+  cupcake: Product;
+  quantityInput: ReactNode;
 }
 
 export function ProductDetails({
@@ -38,21 +39,22 @@ export function ProductDetails({
 }: ProductDetailsProps) {
   const [dialog, setDialog] = useState<'edit' | 'updateAvailability' | null>(
     null,
-  )
-  const { width } = useWindowSize()
-  const { user } = useStore()
+  );
+  const { width } = useWindowSize();
+  const { user } = useStore();
+  const { role } = useAuth();
 
-  const formattedPrice = formatMoney(cupcake.price)
+  const formattedPrice = formatMoney(cupcake.price);
   const unavailable = isUnavailable(
     cupcake.availability_status!,
     user?.user_type,
-  )
+  );
 
   // const isScreenLarge = width > 767
-  const isScreenMedium = width > 639
+  const isScreenMedium = width > 639;
 
   return (
-    <div className="relative mt-4 w-full rounded-lg border bg-card p-4 shadow-sm">
+    <div className="relative w-full p-4 mt-4 border rounded-lg shadow-sm bg-card">
       <div className="flex flex-col items-start gap-4 sm:flex-row sm:justify-between">
         <div
           className={`flex w-full flex-col items-center gap-4 sm:h-28 sm:flex-row sm:gap-3 ${unavailable ? 'cursor-not-allowed opacity-40' : ''}`}
@@ -60,9 +62,9 @@ export function ProductDetails({
           <img
             src={cupcake.img}
             alt={`${cupcake.name} - Imagem do cupcake`}
-            className="h-28 w-28 rounded-md object-cover sm:h-full sm:min-w-24 sm:max-w-24"
+            className="object-cover rounded-md h-28 w-28 sm:h-full sm:min-w-24 sm:max-w-24"
           />
-          <div className="flex w-full flex-col items-stretch justify-between gap-1">
+          <div className="flex flex-col items-stretch justify-between w-full gap-1">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <TooltipProvider>
                 <Tooltip>
@@ -82,7 +84,7 @@ export function ProductDetails({
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <p className="line-clamp-3 text-sm sm:line-clamp-2">
+                  <p className="text-sm line-clamp-3 sm:line-clamp-2">
                     {cupcake.description}
                   </p>
                 </TooltipTrigger>
@@ -100,7 +102,7 @@ export function ProductDetails({
           </div>
         </div>
 
-        {user?.user_type === 'admin' ? (
+        {role === 'ADMIN' ? (
           <AdminControls
             isOpen={dialog}
             setDialog={setDialog}
@@ -125,18 +127,18 @@ export function ProductDetails({
         )}
       </div>
     </div>
-  )
+  );
 }
 
 // Componentes auxiliares para controle de administrador
 interface AdminControlsProps {
-  isOpen: 'edit' | 'updateAvailability' | null
-  setDialog: (dialog: 'edit' | 'updateAvailability' | null) => void
-  cupcake: Product
+  isOpen: 'edit' | 'updateAvailability' | null;
+  setDialog: (dialog: 'edit' | 'updateAvailability' | null) => void;
+  cupcake: Product;
 }
 
 function AdminControls({ isOpen, setDialog, cupcake }: AdminControlsProps) {
-  const unavailable = cupcake.availability_status === 'Indisponível'
+  const unavailable = cupcake.availability_status === 'Indisponível';
 
   return (
     <div className="flex gap-2">
@@ -153,9 +155,9 @@ function AdminControls({ isOpen, setDialog, cupcake }: AdminControlsProps) {
             onClick={() => setDialog('updateAvailability')}
           >
             {unavailable ? (
-              <Eye className="h-5 w-5 text-green-500" />
+              <Eye className="w-5 h-5 text-green-500" />
             ) : (
-              <EyeOff className="h-5 w-5 text-rose-500" />
+              <EyeOff className="w-5 h-5 text-rose-500" />
             )}
           </Button>
         </DialogTrigger>
@@ -178,11 +180,11 @@ function AdminControls({ isOpen, setDialog, cupcake }: AdminControlsProps) {
             variant="ghost"
             onClick={() => setDialog('edit')}
           >
-            <Edit className="h-5 w-5" />
+            <Edit className="w-5 h-5" />
           </Button>
         </DialogTrigger>
         <ProductEdit cupcake={cupcake} onClose={() => setDialog(null)} />
       </Dialog>
     </div>
-  )
+  );
 }

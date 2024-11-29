@@ -17,9 +17,11 @@ import { useStore } from '@/store'
 
 import { OrderTableFilter } from './components/order-table-filter'
 import { OrderTableRow } from './components/order-table-row'
+import { useAuth } from '@/contexts/auth-context'
 
 export function Orders() {
   const { user, orders, fetchAllOrders, fetchUserOrders } = useStore()
+  const { role} = useAuth()
 
   const [pageIndex, setPageIndex] = useState(0)
   const [timeFilter, setTimeFilter] = useState('month')
@@ -62,7 +64,7 @@ export function Orders() {
 
   useEffect(() => {
     if (user) {
-      if (user.user_type === 'admin') {
+      if (role === 'ADMIN') {
         fetchAllOrders()
       } else {
         fetchUserOrders(user.email)
@@ -73,7 +75,7 @@ export function Orders() {
   return (
     <>
       <Helmet title="Pedidos" />
-      {user?.user_type === 'admin' ? (
+      {role === 'ADMIN' ? (
         <div>
           <h1 className="mb-4 text-xl font-semibold sm:mb-0 sm:text-2xl md:text-4xl">
             Pedidos
@@ -88,7 +90,7 @@ export function Orders() {
                 />
 
                 <div>
-                  <div className="overflow-x-auto rounded-md border">
+                  <div className="overflow-x-auto border rounded-md">
                     <Table>
                       <TableHeader>
                         <TableRow>
@@ -157,7 +159,7 @@ export function Orders() {
                 </SelectMenu>
               </div>
               <div>
-                <div className="borde overflow-x-auto rounded-md border">
+                <div className="overflow-x-auto border rounded-md borde">
                   <Table>
                     <TableHeader>
                       <TableRow>

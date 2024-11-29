@@ -30,6 +30,7 @@ import { useStore } from '@/store'
 import { formatOrderDate } from '@/utils/date-utils'
 
 import { formatMoney } from '../../products/components/product-details'
+import { useAuth } from '@/contexts/auth-context'
 
 interface OrderDetailsProps {
   id: number
@@ -68,6 +69,8 @@ export function OrderDetails({
   receiverName,
 }: OrderDetailsProps) {
   const { updateOrderStatus, user, fetchProduct } = useStore()
+  const { role } = useAuth()
+  
   const confirmStatusForm = useForm<ConfirmStatusFormData>({
     resolver: zodResolver(createConfirmStatusFormSchema()),
     defaultValues: {
@@ -152,16 +155,16 @@ export function OrderDetails({
           <TableFooter className="border-0 border-b-2">
             <TableRow>
               <TableCell colSpan={4}>Total do pedido</TableCell>
-              <TableCell className="text-right font-medium">{total}</TableCell>
+              <TableCell className="font-medium text-right">{total}</TableCell>
             </TableRow>
           </TableFooter>
         </Table>
 
-        <Separator className="my-6 h-px w-full" />
-        {user?.user_type === 'admin' ? (
+        <Separator className="w-full h-px my-6" />
+        {role === 'ADMIN'? (
           <FormProvider {...confirmStatusForm}>
             <form onSubmit={handleSubmit(handleConfirmStatus)}>
-              <div className="mb-8 flex flex-col gap-4">
+              <div className="flex flex-col gap-4 mb-8">
                 <div className="flex gap-4">
                   {renderContactInfo('NOME', buyerName)}
                   {receiverName &&
@@ -205,7 +208,7 @@ export function OrderDetails({
                     </p>
                   ) : (
                     <Input
-                      className="mt-1 w-2/3 rounded border p-2"
+                      className="w-2/3 p-2 mt-1 border rounded"
                       {...confirmStatusForm.register('receiverName')}
                       placeholder="Nome"
                     />
@@ -216,7 +219,7 @@ export function OrderDetails({
               <div className="mt-4">
                 <Button
                   variant="outline"
-                  className="px-14 py-6"
+                  className="py-6 px-14"
                   disabled={isSubmitting}
                 >
                   Salvar
@@ -225,7 +228,7 @@ export function OrderDetails({
             </form>
           </FormProvider>
         ) : (
-          <div className="mb-8 flex flex-col gap-4">
+          <div className="flex flex-col gap-4 mb-8">
             <div className="flex gap-4">
               {renderContactInfo('NOME', user?.name)}
               {renderContactInfo('STATUS', status)}

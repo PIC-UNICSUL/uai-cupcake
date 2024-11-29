@@ -9,34 +9,33 @@ import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useStore } from '@/store'
-// import { useMutation } from '@tanstack/react-query'
-// import { signUp } from '@/api/sign-up'
+import { useMutation } from '@tanstack/react-query'
+import { UserService } from '@/services/user'
 
 const signUpFormSchema = z.object({
   name: z
     .string()
-    .nonempty('Por favor, preencha o campo nome')
+    .min(1,'Por favor, preencha o campo nome')
     .min(1, 'Nome tem que ter mais de um caracter'),
-  password_hash: z
+  password: z
     .string()
-    .nonempty('Por favor, preencha o campo senha')
-    .min(8, 'Senha tem que ter no mínimo 8 caracteres'),
-  email: z
+    .min(1,'Por favor, preencha o campo senha')
+    .min(6, 'Senha tem que ter no mínimo 6 caracteres'),
+  mail: z
     .string()
     .nonempty('Por favor, preencha o campo e-mail')
     .email('Digite um e-mail válido'),
   phone: z
     .string()
-    .nonempty('Por favor, preencha o campo celular')
-    .min(14, 'Digite um número de celular válido'),
+    .min(1,'Por favor, preencha o campo celular')
+    .min(14, 'Digite um número de celular válido')
+    .transform((value) => value.replace(/\D/g, '')),
 })
 
 type SignUpForm = z.infer<typeof signUpFormSchema>
 
 export function SignUp() {
   const navigate = useNavigate()
-  const { signup } = useStore()
 
   const {
     register,
@@ -46,35 +45,27 @@ export function SignUp() {
     resolver: zodResolver(signUpFormSchema),
   })
 
-  // const { mutateAsync: newAccount } = useMutation({
-  //   mutationFn: signUp,
-  // })
-
-  async function handleSignUp(data: SignUpForm) {
-    try {
-      // await newAccount({ name: data.name, email: data.email, password: data.password_hash, phone: data.phone })
-
-      const errorMessage = signup(data)
-
-      if (typeof errorMessage === 'string') {
-        toast.error(errorMessage)
-        return
-      }
-
-      toast.success('Usuário cadastrado com sucesso!')
+  const { mutateAsync: signUp } = useMutation({
+    mutationFn: async (data: SignUpForm) => {
+      const response = await UserService.createAccount(data)
+      return response
+    },
+    onSuccess: () => {
+      toast.success('Cadastro realizado com sucesso!')
       navigate('/sign-in')
-    } catch (error: any) {
-      // const errorMessage = error.response?.data?.message || 'Erro ao cadastrar usuário';
-      // toast.error(errorMessage);
-      toast.error('Erro ao cadastrar usuário')
-    }
-  }
+    },
+    onError: (error: any) => {
+      toast.error(
+        error?.response?.data?.[0].message || 'Erro ao realizar cadastro.' 
+      )
+    },
+  })
 
   return (
     <>
       <Helmet title="Sign Up" />
       <div className="px-2 py-8 lg:px-0">
-        <div className="flex max-w-80 flex-col justify-center gap-6">
+        <div className="flex flex-col justify-center gap-6 max-w-80">
           <div className="flex flex-col gap-2 text-center">
             <h1 className="text-2xl font-semibold tracking-tight">
               Criar conta grátis
@@ -83,7 +74,7 @@ export function SignUp() {
               Faça seu cadastro para comprar seus cupcakes!
             </p>
           </div>
-          <form className="space-y-4" onSubmit={handleSubmit(handleSignUp)}>
+          <form className="space-y-4" onSubmit={handleSubmit((data) => signUp(data))}>
             <div className="space-y-1">
               <Label htmlFor="name">Nome</Label>
               <Input
@@ -102,11 +93,11 @@ export function SignUp() {
               <Input
                 id="email"
                 type="email"
-                {...register('email')}
+                {...register('mail')}
                 placeholder="Digite seu e-mail"
               />
-              {errors.email && (
-                <p className="text-red-500">{errors.email.message}</p>
+              {errors.mail && (
+                <p className="text-red-500">{errors.mail.message}</p>
               )}
             </div>
 
@@ -114,7 +105,7 @@ export function SignUp() {
               <Label htmlFor="phone">Celular</Label>
               <InputMask
                 id="phone"
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex w-full h-10 px-3 py-2 text-sm border rounded-md border-input bg-background ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 mask="(99) \99999-9999"
                 placeholder="Digite seu celular"
                 {...register('phone')}
@@ -129,11 +120,11 @@ export function SignUp() {
               <Input
                 id="password_hash"
                 type="password"
-                {...register('password_hash')}
+                {...register('password')}
                 placeholder="Digite sua senha"
               />
-              {errors.password_hash && (
-                <p className="text-red-500">{errors.password_hash.message}</p>
+              {errors.password && (
+                <p className="text-red-500">{errors.password.message}</p>
               )}
             </div>
 

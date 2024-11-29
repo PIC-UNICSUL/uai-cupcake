@@ -1,10 +1,10 @@
+import { useAuth } from '@/contexts/auth-context';
 import { SignIn } from '@/pages/auth/sign-in'
-import { useStore } from '@/store'
 
 export function RequireAuth({ children }: { children: JSX.Element }) {
-  const { user } = useStore()
+  const { isAuthenticated } = useAuth();
 
-  if (!user) {
+  if (!isAuthenticated) {
     return <SignIn />
   }
 

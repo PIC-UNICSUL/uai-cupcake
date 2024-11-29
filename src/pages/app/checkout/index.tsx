@@ -9,6 +9,7 @@ import { useStore } from '@/store'
 
 import { formatMoney } from '../products/components/product-details'
 import { ProductsCheckout } from './components/products-checkout'
+import { useAuth } from '@/contexts/auth-context'
 
 type CartItemWithProductInfo = OrderItems &
   Pick<Product, 'name' | 'description' | 'img' | 'price'>
@@ -16,6 +17,7 @@ type CartItemWithProductInfo = OrderItems &
 export function Checkout() {
   const { cartItems, cartItemsTotal, cleanCart, addOrder, user, products } =
     useStore()
+    const { isAuthenticated } = useAuth();
 
   const formattedItemsTotal = formatMoney(cartItemsTotal)
 
@@ -23,9 +25,9 @@ export function Checkout() {
 
   function handleCheckout() {
     if (cartItems.length > 0) {
-      if (!user) return
-      addOrder(user, cartItems, cartItemsTotal)
-      cleanCart(user?.email)
+      if (!isAuthenticated) return
+      // addOrder(user, cartItems, cartItemsTotal)
+      // cleanCart(user?.email)
 
       navigate('/orders')
     }
@@ -51,13 +53,13 @@ export function Checkout() {
     <div>
       <Helmet title="Checkout" />
       {cartItems.length > 0 ? (
-        <div className="container relative flex min-h-screen flex-col-reverse p-0 antialiased lg:grid lg:max-w-none lg:grid-cols-2">
-          <div className="relative flex h-full w-full flex-col py-10 text-muted-foreground lg:p-10">
-            <div className="flex h-full w-full flex-col gap-3 text-foreground">
+        <div className="container relative flex flex-col-reverse min-h-screen p-0 antialiased lg:grid lg:max-w-none lg:grid-cols-2">
+          <div className="relative flex flex-col w-full h-full py-10 text-muted-foreground lg:p-10">
+            <div className="flex flex-col w-full h-full gap-3 text-foreground">
               <span className="mb-1 text-3xl font-bold lg:mb-4 lg:text-5xl">
                 Retirada
               </span>
-              <div className="mb-2 flex flex-col gap-2 text-sm md:text-base lg:mb-10 lg:gap-5 lg:text-lg">
+              <div className="flex flex-col gap-2 mb-2 text-sm md:text-base lg:mb-10 lg:gap-5 lg:text-lg">
                 <p>O nosso prazo de retirada é de 3 dias úteis</p>
                 <p>
                   Porém, se o seu pedido for acima de 50 unidades, fale conosco
@@ -73,11 +75,11 @@ export function Checkout() {
             </div>
           </div>
 
-          <div className="relative h-full flex-col text-muted-foreground lg:flex lg:px-10 lg:py-16">
-            <div className="flex h-full w-full flex-col gap-3 text-foreground lg:w-4/5">
+          <div className="relative flex-col h-full text-muted-foreground lg:flex lg:px-10 lg:py-16">
+            <div className="flex flex-col w-full h-full gap-3 text-foreground lg:w-4/5">
               <span className="mb-4 text-2xl">Revise seu pedido</span>
-              <ScrollArea className="h-80 w-full">
-                <div className=" flex flex-col gap-4">
+              <ScrollArea className="w-full h-80">
+                <div className="flex flex-col gap-4 ">
                   {cartItemsWithProductInfo.map((item) => (
                     <ProductsCheckout key={item.order_item_id} cupcake={item} />
                   ))}
@@ -108,8 +110,8 @@ export function Checkout() {
           </div>
         </div>
       ) : (
-        <div className="flex h-screen items-center justify-center">
-          <section className="flex flex-col items-center rounded p-8">
+        <div className="flex items-center justify-center h-screen">
+          <section className="flex flex-col items-center p-8 rounded">
             <h2 className="text-lg">Não há itens no carrinho!</h2>
             <p className="mt-1 text-lg">
               Selecione os itens na ágina de produtos e finalize sua compra aqui

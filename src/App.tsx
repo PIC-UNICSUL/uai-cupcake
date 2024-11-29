@@ -10,6 +10,7 @@ import { useStore } from '@/store'
 
 import { queryClient } from './lib/react-query'
 import { router } from './routes'
+import { AuthProvider } from './contexts/auth-context'
 
 export function App() {
   const { initializeUserFromStorage } = useStore()
@@ -22,7 +23,9 @@ export function App() {
     <HelmetProvider>
       <Helmet titleTemplate="%s | UAI Cupcake" />
       <QueryClientProvider client={queryClient}>
+      <AuthProvider>
         <RouterProvider router={router} />
+      </AuthProvider>
       </QueryClientProvider>
       <Toaster richColors duration={1500} position="top-right" />
     </HelmetProvider>

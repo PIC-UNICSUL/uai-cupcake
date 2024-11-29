@@ -22,6 +22,7 @@ import { useStore } from '@/store'
 
 import { NewProduct } from './components/new-product'
 import { ProductDetails } from './components/product-details'
+import { useAuth } from '@/contexts/auth-context'
 
 export function Products() {
   const [quantities, setQuantities] = useState<{ [key: number]: number }>({})
@@ -33,6 +34,7 @@ export function Products() {
   const [sortOption, setSortOption] = useState<string>('padrao')
 
   const { signed, user, addProductsToCart, products, addProduct } = useStore()
+  const { isAuthenticated, role} = useAuth();
 
   // Atualizar os filtros ao clicar no checkbox
   function handleFilterChange(category: string, checked: boolean) {
@@ -68,7 +70,7 @@ export function Products() {
       (product) =>
         (filters.length === 0 || filters.includes(product.category)) &&
         (product.availability_status === 'Disponível' ||
-          user?.user_type === 'admin'),
+          role === 'ADMIN'),
     )
 
     if (sortOption === 'price-asc') {
@@ -113,9 +115,9 @@ export function Products() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col gap-6">
+    <div className="flex flex-col min-h-screen gap-6">
       <div className="w-full">
-        <p className="text-semibold text-xl md:text-4xl">Todos</p>
+        <p className="text-xl text-semibold md:text-4xl">Todos</p>
       </div>
 
       <div className="grid w-full md:grid-cols-[320px_1fr]">
@@ -132,7 +134,7 @@ export function Products() {
           </div>
           <div>
             <p className="pb-4 text-xs font-bold">Categorias</p>
-            <div className="mb-4 flex flex-col gap-1 sm:mb-0">
+            <div className="flex flex-col gap-1 mb-4 sm:mb-0">
               {categories.map((category) => (
                 <div key={category} className="flex items-center space-x-2">
                   <Checkbox
@@ -150,12 +152,12 @@ export function Products() {
                   </Label>
                 </div>
               ))}
-              {user?.user_type === 'admin' && (
+              {role === 'ADMIN' && (
                 <div className="mt-2">
                   <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                     <DialogTrigger asChild>
                       <Button className="flex gap-2">
-                        <CirclePlus className="h-4 w-4" />
+                        <CirclePlus className="w-4 h-4" />
                         Cupcake
                       </Button>
                     </DialogTrigger>
@@ -171,7 +173,7 @@ export function Products() {
         </div>
 
         {products.length > 0 ? (
-          <div className="flex w-full flex-col">
+          <div className="flex flex-col w-full">
             <div className="pb-11">
               <div className="flex flex-col items-end">
                 <SelectMenu
@@ -193,7 +195,7 @@ export function Products() {
                 </p>
               </div>
               {filteredProducts.length === 0 && (
-                <div className="flex h-full items-center justify-center">
+                <div className="flex items-center justify-center h-full">
                   <p className="text-2xl font-semibold">
                     Nenhum produto encontrado
                   </p>
@@ -226,7 +228,7 @@ export function Products() {
                       />
                     ))}
                   </div>
-                  {signed ? (
+                  {isAuthenticated ? (
                     <div
                       className={`w-full text-center ${filteredProducts.length === 0 && 'hidden'} `}
                     >
@@ -234,7 +236,7 @@ export function Products() {
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button
-                              className="fixed bottom-16 right-16 rounded-full transition disabled:opacity-40"
+                              className="fixed transition rounded-full bottom-16 right-16 disabled:opacity-40"
                               disabled={
                                 products.filter(
                                   (cupcake) =>
@@ -243,8 +245,8 @@ export function Products() {
                               }
                               onClick={handleAddToCart}
                             >
-                              <Plus className="h-4 w-4" />{' '}
-                              <ShoppingCart className="h-4 w-4" />
+                              <Plus className="w-4 h-4" />{' '}
+                              <ShoppingCart className="w-4 h-4" />
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent className="mb-3">
@@ -256,7 +258,7 @@ export function Products() {
                   ) : (
                     <Link
                       to="/sign-in"
-                      className="flex w-full flex-col items-center"
+                      className="flex flex-col items-center w-full"
                     >
                       <Button className="w-3/6 text-center" variant="outline">
                         Faça login para comprar
@@ -268,7 +270,7 @@ export function Products() {
             </div>
           </div>
         ) : (
-          <div className="flex h-full items-center justify-center">
+          <div className="flex items-center justify-center h-full">
             <p className="text-2xl font-semibold">Nenhum produto encontrado</p>
           </div>
         )}

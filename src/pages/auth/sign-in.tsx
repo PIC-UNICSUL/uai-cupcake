@@ -7,19 +7,18 @@ import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useStore } from '@/store'
-// import { useMutation } from '@tanstack/react-query'
-// import { signIn } from '@/api/sign-in'
+import { useMutation } from '@tanstack/react-query'
+import { AuthService } from '@/services/auth'
+import { useAuth } from '@/contexts/auth-context'
+
 
 const signInSchema = z.object({
-  email: z
-    .string()
-    .nonempty('Preencha com o e-mail cadastrado')
+  mail: z
+    .string().min(1, { message: 'Preencha com o e-mail cadastrado' })
     .email('E-mail inválido'),
-  password: z
-    .string()
-    .nonempty('Preencha com a senha cadastrada')
-    .min(8, 'Senha incorreta'),
+  password: 
+  z.string().min(1, 'Preencha com a senha cadastrada')
+    .min(6, 'Senha incorreta'),
 })
 
 type SignInSchema = z.infer<typeof signInSchema>
@@ -27,7 +26,7 @@ type SignInSchema = z.infer<typeof signInSchema>
 export function SignIn() {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
-  const { signin, loadCartForUser } = useStore()
+  const { setAuthState } = useAuth();
 
   const {
     register,
@@ -36,34 +35,35 @@ export function SignIn() {
   } = useForm<SignInSchema>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
-      email: searchParams.get('email') ?? '',
+      mail: searchParams.get('email') ?? '',
     },
   })
 
-  // const { mutateAsync: authenticate } = useMutation({
-  //   mutationFn: signIn,
-  // })
+  const { mutateAsync: authenticate } = useMutation({
+    mutationFn: async (data: SignInSchema) => {
+      const response = await AuthService.login(data);
+      return response;
+    },
+    onSuccess: () => {
+      const decoded = AuthService.decodeToken();
+      setAuthState({
+        isAuthenticated: true,
+        role: decoded?.scope?.[0] || null,
+      });
 
-  async function handleAuthenticate(data: SignInSchema) {
-    try {
-      // await authenticate({ email: data.email, password: data.password })
-      const errorMessage = signin(data.email, data.password)
-
-      if (typeof errorMessage === 'string') {
-        toast.error(errorMessage)
-        return
-      }
-
-      loadCartForUser(data.email)
-      navigate('/')
-    } catch (err) {
-      toast.error('Credenciais inválidas')
-    }
-  }
+      toast.success('Login realizado com sucesso!');
+      navigate('/');
+    },
+    onError: (error: any) => {
+      toast.error(
+        error?.response?.data?.[0].message || 'Erro ao realizar login. Verifique suas credenciais.'
+      );
+    },
+  });
 
   return (
     <div className="w-full lg:p-8">
-      <div className="mx-auto flex h-screen max-w-80 flex-col justify-center space-y-6 lg:h-full">
+      <div className="flex flex-col justify-center h-screen mx-auto space-y-6 max-w-80 lg:h-full">
         <div className="flex flex-col space-y-2 text-center">
           <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
             Login
@@ -71,7 +71,7 @@ export function SignIn() {
         </div>
 
         <div className="grid gap-6">
-          <form onSubmit={handleSubmit(handleAuthenticate)}>
+          <form onSubmit={handleSubmit((data)=> authenticate(data))}>
             <div className="grid gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="email">Seu e-mail</Label>
@@ -81,10 +81,10 @@ export function SignIn() {
                   autoCapitalize="none"
                   autoComplete="email"
                   autoCorrect="off"
-                  {...register('email')}
+                  {...register('mail')}
                 />
-                {errors.email && (
-                  <p className="text-red-500">{errors.email.message}</p>
+                {errors.mail && (
+                  <p className="text-red-500">{errors.mail.message}</p>
                 )}
               </div>
               <div className="grid gap-2">

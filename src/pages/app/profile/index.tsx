@@ -1,15 +1,14 @@
-import { Helmet } from 'react-helmet-async'
+import { Helmet } from 'react-helmet-async';
 
-import { NavLink } from '@/components/nav-link'
-import { Button } from '@/components/ui/button'
-import { Dialog, DialogTrigger } from '@/components/ui/dialog'
-import { Separator } from '@/components/ui/separator'
-import { useStore } from '@/store'
-
-import { ProfileEdit } from './components/profile-edit'
+import { NavLink } from '@/components/nav-link';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogTrigger } from '@/components/ui/dialog';
+import { Separator } from '@/components/ui/separator';
+import { ProfileEdit } from './components/profile-edit';
+import { useAuth } from '@/contexts/auth-context';
 
 export function Profile() {
-  const { user } = useStore()
+  const { user } = useAuth();
 
   return (
     <>
@@ -57,7 +56,7 @@ export function Profile() {
                 E-MAIL
               </p>
               <p className="text-sm text-muted-foreground sm:text-base md:text-lg">
-                {user?.email}
+                {user?.mail}
               </p>
             </div>
           </div>
@@ -76,7 +75,7 @@ export function Profile() {
               </DialogTrigger>
               <ProfileEdit
                 name={user?.name ?? ''}
-                email={user?.email ?? ''}
+                email={user?.mail ?? ''}
                 phone={user?.phone ?? ''}
               />
             </Dialog>
@@ -84,5 +83,5 @@ export function Profile() {
         </div>
       </div>
     </>
-  )
+  );
 }
