@@ -23,6 +23,7 @@ import { useStore } from '@/store'
 import { NewProduct } from './components/new-product'
 import { ProductDetails } from './components/product-details'
 import { useAuth } from '@/contexts/auth-context'
+import { useProducts } from '@/hooks/useProducts'
 
 export function Products() {
   const [quantities, setQuantities] = useState<{ [key: number]: number }>({})
@@ -113,6 +114,12 @@ export function Products() {
 
     toast.success('Cupcake adicionado com sucesso!')
   }
+
+
+  //wip
+  const {products: pro} = useProducts();
+  const productsFiltered = pro?.filter((pro) => pro.availabilityStatus === 'AVAILABLE');
+  console.log(productsFiltered, 'wip : products filtered');
 
   return (
     <div className="flex flex-col min-h-screen gap-6">

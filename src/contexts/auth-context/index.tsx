@@ -2,7 +2,7 @@ import { createContext, useState, useEffect, useContext } from "react";
 import { AuthService } from "@/services/auth";
 import { useUser } from "@/hooks/useUser";
 import { useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
+import { router } from "@/routes";
 
 interface AuthContextData {
   isAuthenticated: boolean;
@@ -19,7 +19,6 @@ const AuthProvider = ({ children }: any) => {
   const [role, setRole] = useState<string | null>(null);
   const { user, isLoading } = useUser(isAuthenticated);
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
 
   const setAuthState = (authState: { isAuthenticated: boolean; role: string | null }) => {
     setIsAuthenticated(authState.isAuthenticated);
@@ -54,13 +53,13 @@ const AuthProvider = ({ children }: any) => {
       const expirationTime = decoded.exp * 1000 - Date.now();
   
       const timeout = setTimeout(() => {
-        logout();
-        navigate("/login");
+      logout();
+       router.navigate('/login')
       }, expirationTime);
   
       return () => clearTimeout(timeout); 
     }
-  }, [isAuthenticated, navigate, logout]);
+  }, [isAuthenticated, logout]);
 
 
   return (
