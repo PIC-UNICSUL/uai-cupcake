@@ -2,6 +2,7 @@ import { createContext, useState, useEffect, useContext } from "react";
 import { AuthService } from "@/services/auth";
 import { useUser } from "@/hooks/useUser";
 import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 
 interface AuthContextData {
   isAuthenticated: boolean;
@@ -18,6 +19,7 @@ const AuthProvider = ({ children }: any) => {
   const [role, setRole] = useState<string | null>(null);
   const { user, isLoading } = useUser(isAuthenticated);
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const setAuthState = (authState: { isAuthenticated: boolean; role: string | null }) => {
     setIsAuthenticated(authState.isAuthenticated);
@@ -26,6 +28,13 @@ const AuthProvider = ({ children }: any) => {
     if (authState.isAuthenticated) {
       queryClient.invalidateQueries({ queryKey: ["user"] });
     }
+  };
+
+  const logout = () => {
+    AuthService.logout();
+    setIsAuthenticated(false);
+    setRole(null);
+    queryClient.clear();
   };
 
   useEffect(() => {
@@ -38,12 +47,21 @@ const AuthProvider = ({ children }: any) => {
     }
   }, []);
 
-  const logout = () => {
-    AuthService.logout();
-    setIsAuthenticated(false);
-    setRole(null);
-    queryClient.clear();
-  };
+  useEffect(() => {
+    const decoded = AuthService.decodeToken();
+  
+    if (decoded && decoded.exp) {
+      const expirationTime = decoded.exp * 1000 - Date.now();
+  
+      const timeout = setTimeout(() => {
+        logout();
+        navigate("/login");
+      }, expirationTime);
+  
+      return () => clearTimeout(timeout); 
+    }
+  }, [isAuthenticated, navigate, logout]);
+
 
   return (
     <AuthContext.Provider
