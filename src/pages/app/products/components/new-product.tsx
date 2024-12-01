@@ -1,20 +1,20 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import { z } from 'zod';
 
-import { Product } from '@/@types/types'
-import { Button } from '@/components/ui/button'
+import { Product } from '@/@types/types';
+import { Button } from '@/components/ui/button';
 import {
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 
 const newCupcakeFormSchema = z.object({
   name: z
@@ -30,15 +30,15 @@ const newCupcakeFormSchema = z.object({
   img: z.instanceof(File).refine((file) => file.size > 0, {
     message: 'Imagem é obrigatória',
   }),
-})
+});
 
-type NewCupcakeForm = z.infer<typeof newCupcakeFormSchema>
+type NewCupcakeForm = z.infer<typeof newCupcakeFormSchema>;
 
 interface NewProductProps {
-  onClose: () => void
+  onClose: () => void;
   onAddProduct: (
-    newProduct: Omit<Product, 'product_id' | 'availability_status'>,
-  ) => void
+    newProduct: Omit<Product, 'product_id' | 'availabilityStatus'>,
+  ) => void;
 }
 
 export function NewProduct({ onClose, onAddProduct }: NewProductProps) {
@@ -49,17 +49,17 @@ export function NewProduct({ onClose, onAddProduct }: NewProductProps) {
     setValue,
   } = useForm<NewCupcakeForm>({
     resolver: zodResolver(newCupcakeFormSchema),
-  })
+  });
 
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   // Função para lidar com a mudança na seleção da imagem
   function handleImageChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0]
+    const file = event.target.files?.[0];
     if (file) {
-      setValue('img', file)
-      const previewUrl = URL.createObjectURL(file) // Cria uma URL para o arquivo selecionado
-      setImagePreview(previewUrl) // Atualiza o estado com a URL da imagem
+      setValue('img', file);
+      const previewUrl = URL.createObjectURL(file); // Cria uma URL para o arquivo selecionado
+      setImagePreview(previewUrl); // Atualiza o estado com a URL da imagem
     }
   }
 
@@ -71,13 +71,13 @@ export function NewProduct({ onClose, onAddProduct }: NewProductProps) {
         category: data.category,
         price: parseFloat(data.price.replace(',', '.')),
         img: data.img ? URL.createObjectURL(data.img) : '',
-      }
+      };
 
       // const errorMessage = addProduct(newProduct)
-      onAddProduct(newProduct)
-      onClose()
+      onAddProduct(newProduct);
+      onClose();
     } catch (error) {
-      toast.error('Erro ao cadastrar produto')
+      toast.error('Erro ao cadastrar produto');
     }
   }
 
@@ -174,5 +174,5 @@ export function NewProduct({ onClose, onAddProduct }: NewProductProps) {
         </DialogFooter>
       </form>
     </DialogContent>
-  )
+  );
 }

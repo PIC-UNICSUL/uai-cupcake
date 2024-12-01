@@ -20,3 +20,9 @@ interface UpdateProductAvailabilityReq {
   id: string;
   availabilityStatus: string;
 }
+
+interface ParamsGetProducts {
+  category?: string;
+  order?: 'asc' | 'desc';
+  limit?: number;
+}

@@ -1,12 +1,13 @@
-import {  useQuery, } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { UserService } from '@/services/user';
+import { AuthService } from '@/services/auth';
 
-const useUser = (isAuthenticated?: boolean) => {
+const useUser = () => {
+  const token = AuthService.getToken();
   const { data, isLoading, error } = useQuery<User>({
-    queryKey: ['user', isAuthenticated],
+    queryKey: ['user', token],
     queryFn: () => UserService.getUser(),
-    enabled: isAuthenticated,
-    
+    enabled: !!token,
   });
   return {
     user: data,

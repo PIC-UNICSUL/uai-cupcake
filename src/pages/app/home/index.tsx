@@ -1,26 +1,26 @@
-import { Helmet } from 'react-helmet-async'
-import { Link } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async';
+import { Link } from 'react-router-dom';
 
-import { productStatus } from '@/@types/types'
-import { Header } from '@/components/header'
-import { Button } from '@/components/ui/button'
-import useWindowSize from '@/hooks/useWindowSize'
-import { useStore } from '@/store'
+import { productStatus } from '@/@types/types';
+import { Header } from '@/components/header';
+import { Button } from '@/components/ui/button';
+import useWindowSize from '@/hooks/useWindowSize';
+import { useStore } from '@/store';
 
-import { formatMoney } from '../products/components/product-details'
-import { CardProduct } from './components/card'
+import { formatMoney } from '../products/components/product-details';
+import { CardProduct } from './components/card';
 
 export function Home() {
-  const { products } = useStore()
-  const { width } = useWindowSize()
+  const { products } = useStore();
+  const { width } = useWindowSize();
 
   // Define o número de cupcakes a serem exibidos
-  const cupcakesToShow = width < 768 ? 2 : 3
+  const cupcakesToShow = width < 768 ? 2 : 3;
 
   // Filtra produtos disponíveis
   const availableProducts = products.filter(
-    (product) => product.availability_status === productStatus.available,
-  )
+    (product) => product.availabilityStatus === productStatus.available,
+  );
 
   return (
     <>
@@ -89,5 +89,5 @@ export function Home() {
         </div>
       </div>
     </>
-  )
+  );
 }

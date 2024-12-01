@@ -9,42 +9,39 @@ import {
   PlusCircle,
   ShoppingCart,
   UtensilsCrossed,
-} from 'lucide-react'
-import { useCallback, useMemo, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+} from 'lucide-react';
+import { useCallback, useMemo, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useStore } from '@/store';
 
-import { User, userType } from '@/@types/types'
-import { useStore } from '@/store'
-
-import { AccountMenu } from './account-menu'
-import { Cart } from './cart'
-import { Logo } from './logo'
-import { NavLink } from './nav-link'
-import { Button } from './ui/button'
-import { Separator } from './ui/separator'
-import { Sheet, SheetContent, SheetTrigger } from './ui/sheet'
-import { useAuth } from '@/contexts/auth-context'
+import { AccountMenu } from './account-menu';
+import { Cart } from './cart';
+import { Logo } from './logo';
+import { NavLink } from './nav-link';
+import { Button } from './ui/button';
+import { Separator } from './ui/separator';
+import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
+import { useAuth } from '@/contexts/auth-context';
 
 export function Header() {
-  const {user, signout, promoteToAdmin, cartQuantity, cartItems } =
-    useStore()
+  const { signout, promoteToAdmin, cartQuantity, cartItems } = useStore();
 
-  const { isAuthenticated, role, logout} = useAuth();
-  const navigate = useNavigate()
+  const { isAuthenticated, role, logout, user } = useAuth();
+  const navigate = useNavigate();
 
   const handlePromoteToAdmin = useCallback(() => {
-    if (user && user.user_id) promoteToAdmin(user.user_id)
-  }, [user, promoteToAdmin])
+    if (user && user.id) promoteToAdmin(user.id);
+  }, [user, promoteToAdmin]);
 
   const handleSignOut = useCallback(() => {
-    logout()
-    navigate('/')
-  }, [logout, navigate])
+    logout();
+    navigate('/');
+  }, [logout, navigate]);
 
   const cartQuantityLabel = useMemo(
     () => (cartQuantity > 0 ? cartItems.length : ''),
     [cartQuantity],
-  )
+  );
 
   return (
     <header className="fixed z-10 w-full bg-white border-b">
@@ -74,7 +71,7 @@ export function Header() {
         <MobileMenu onPromoteToAdmin={handlePromoteToAdmin} />
       </div>
     </header>
-  )
+  );
 }
 
 // Componentes Separados para Links de Navegação, Menu de Usuário e Menu Mobile
@@ -94,7 +91,7 @@ function NavigationLinks() {
         Contato
       </NavLink>
     </nav>
-  )
+  );
 }
 
 function GuestMenu() {
@@ -103,15 +100,15 @@ function GuestMenu() {
       <NavLink to="/sign-in">Entrar</NavLink>
       <NavLink to="/sign-up">Cadastrar</NavLink>
     </div>
-  )
+  );
 }
 
 interface UserMenuProps {
-  user: User | null
-  cartQuantityLabel: number | ''
-  onSignOut: () => void
-  onPromoteToAdmin: () => void
-  role: string | null
+  user: User | null;
+  cartQuantityLabel: number | '';
+  onSignOut: () => void;
+  onPromoteToAdmin: () => void;
+  role: string | null;
 }
 
 function AdminMenu({ onSignOut }: { onSignOut: () => void }) {
@@ -127,7 +124,7 @@ function AdminMenu({ onSignOut }: { onSignOut: () => void }) {
         Sair
       </Button>
     </div>
-  )
+  );
 }
 
 function UserMenu({
@@ -135,7 +132,7 @@ function UserMenu({
   cartQuantityLabel,
   onSignOut,
   onPromoteToAdmin,
-  role
+  role,
 }: UserMenuProps) {
   return (
     <>
@@ -149,13 +146,13 @@ function UserMenu({
         />
       )}
     </>
-  )
+  );
 }
 
 interface CustomerMenuProps {
-  cartQuantityLabel: number | ''
-  user: User | null
-  onPromoteToAdmin: () => void
+  cartQuantityLabel: number | '';
+  user: User | null;
+  onPromoteToAdmin: () => void;
 }
 
 function CustomerMenu({
@@ -163,9 +160,9 @@ function CustomerMenu({
   user,
   onPromoteToAdmin,
 }: CustomerMenuProps) {
-  const [isCartOpen, setCartOpen] = useState(false)
+  const [isCartOpen, setCartOpen] = useState(false);
 
-  const handleCloseCart = () => setCartOpen(false)
+  const handleCloseCart = () => setCartOpen(false);
 
   return (
     <>
@@ -185,7 +182,7 @@ function CustomerMenu({
       <div className="hidden sm:block">
         <AccountMenu />
       </div>
-      {user?.email === 'admin@email.com' && user.user_type !== 'admin' && (
+      {user?.mail === 'admin@email.com' && user.role !== 'ADMIN' && (
         <Button
           size="custom"
           variant="ghost"
@@ -196,23 +193,21 @@ function CustomerMenu({
         </Button>
       )}
     </>
-  )
+  );
 }
 
 interface MobileMenuProps {
-  onPromoteToAdmin: () => void
+  onPromoteToAdmin: () => void;
 }
 
 function MobileMenu({ onPromoteToAdmin }: MobileMenuProps) {
-  const { user, signout } = useStore()
-  const { isAuthenticated,  role, logout} = useAuth();
-  const navigate = useNavigate()
- 
+  const { isAuthenticated, role, logout, user } = useAuth();
+  const navigate = useNavigate();
 
   const handleSignOut = useCallback(() => {
-    logout()
-    navigate('/')
-  }, [logout, navigate])
+    logout();
+    navigate('/');
+  }, [logout, navigate]);
 
   return (
     <div className="sm:hidden">
@@ -231,7 +226,7 @@ function MobileMenu({ onPromoteToAdmin }: MobileMenuProps) {
                     {user?.name}
                   </span>
                   <span className="overflow-hidden text-xs font-normal text-ellipsis whitespace-nowrap text-muted-foreground">
-                    {user?.email}
+                    {user?.mail}
                   </span>
                 </div>
                 <Separator />
@@ -289,5 +284,5 @@ function MobileMenu({ onPromoteToAdmin }: MobileMenuProps) {
         </SheetContent>
       </Sheet>
     </div>
-  )
+  );
 }

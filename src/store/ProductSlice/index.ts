@@ -1,8 +1,8 @@
-import { StateCreator } from 'zustand'
-import { immer } from 'zustand/middleware/immer'
+import { StateCreator } from 'zustand';
+import { immer } from 'zustand/middleware/immer';
 
-import { Product, ProductState, productStatus } from '@/@types/types'
-import { Cupcakes } from '@/mock/Cupcakes'
+import { ProductState, productStatus } from '@/@types/types';
+import { Cupcakes } from '@/mock/Cupcakes';
 
 export const createProductSlice: StateCreator<
   ProductState,
@@ -13,15 +13,15 @@ export const createProductSlice: StateCreator<
 
   // Função para buscar um produto pelo ID
   fetchProduct: (id: number): Product | undefined => {
-    const product = get().products.find((product) => product.product_id === id)
-    return product
+    const product = get().products.find((product) => product.product_id === id);
+    return product;
   },
 
   // Função para adicionar um produto
   addProduct: (
     newProduct: Omit<
       Product,
-      'product_id' | 'created_at' | 'availability_status'
+      'product_id' | 'created_at' | 'availabilityStatus'
     >,
   ) => {
     set((state) => {
@@ -29,9 +29,9 @@ export const createProductSlice: StateCreator<
         ...newProduct,
         product_id: get().products.length + 1,
         created_at: new Date(),
-        availability_status: productStatus.available,
-      })
-    })
+        availabilityStatus: productStatus.available,
+      });
+    });
   },
 
   // Função para remover um produto
@@ -39,8 +39,8 @@ export const createProductSlice: StateCreator<
     set((state) => {
       state.products = state.products.filter(
         (product) => product.product_id !== productId,
-      )
-    })
+      );
+    });
   },
 
   // Função para atualizar um produto
@@ -52,8 +52,8 @@ export const createProductSlice: StateCreator<
         product.product_id === updatedProduct.product_id
           ? { ...product, ...updatedProduct }
           : product,
-      )
-    })
+      );
+    });
   },
 
   // Função para atualizar o status de disponibilidade
@@ -61,9 +61,9 @@ export const createProductSlice: StateCreator<
     set((state) => {
       state.products = state.products.map((product) =>
         product.product_id === id
-          ? { ...product, availability_status: status }
+          ? { ...product, availabilityStatus: status }
           : product,
-      )
-    })
+      );
+    });
   },
-}))
+}));

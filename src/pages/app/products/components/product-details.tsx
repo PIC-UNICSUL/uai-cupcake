@@ -1,7 +1,7 @@
 import { Edit, Eye, EyeOff } from 'lucide-react';
 import { ReactNode, useState } from 'react';
 
-import { Product, productStatus } from '@/@types/types';
+import { productStatus } from '@/@types/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogTrigger } from '@/components/ui/dialog';
@@ -12,7 +12,6 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import useWindowSize from '@/hooks/useWindowSize';
-import { useStore } from '@/store';
 
 import { ProductEdit } from './product-edit';
 import { UpdateProductAvailability } from './update-product-availability';
@@ -41,13 +40,12 @@ export function ProductDetails({
     null,
   );
   const { width } = useWindowSize();
-  const { user } = useStore();
-  const { role } = useAuth();
+  const { role, user } = useAuth();
 
   const formattedPrice = formatMoney(cupcake.price);
   const unavailable = isUnavailable(
-    cupcake.availability_status!,
-    user?.user_type,
+    cupcake.availabilityStatus!,
+    user?.role === 'ADMIN' ? 'admin' : undefined,
   );
 
   // const isScreenLarge = width > 767
@@ -59,11 +57,13 @@ export function ProductDetails({
         <div
           className={`flex w-full flex-col items-center gap-4 sm:h-28 sm:flex-row sm:gap-3 ${unavailable ? 'cursor-not-allowed opacity-40' : ''}`}
         >
-          <img
-            src={cupcake.img}
-            alt={`${cupcake.name} - Imagem do cupcake`}
-            className="object-cover rounded-md h-28 w-28 sm:h-full sm:min-w-24 sm:max-w-24"
-          />
+          {cupcake.photos && (
+            <img
+              src={cupcake?.photos}
+              alt={`${cupcake.name} - Imagem do cupcake`}
+              className="object-cover rounded-md h-28 w-28 sm:h-full sm:min-w-24 sm:max-w-24"
+            />
+          )}
           <div className="flex flex-col items-stretch justify-between w-full gap-1">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <TooltipProvider>
@@ -138,7 +138,7 @@ interface AdminControlsProps {
 }
 
 function AdminControls({ isOpen, setDialog, cupcake }: AdminControlsProps) {
-  const unavailable = cupcake.availability_status === 'Indisponível';
+  const unavailable = cupcake.availabilityStatus === 'UNAVAILABLE';
 
   return (
     <div className="flex gap-2">

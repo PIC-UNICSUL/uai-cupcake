@@ -4,8 +4,8 @@ const RESOURSE = '/product';
 const ADMIN_RESOURSE = '/admin/product';
 
 const ProductService = {
-  getProducts: async (): Promise<Product[]> => {
-    const response = await api.get(RESOURSE);
+  getProducts: async (filters?: ParamsGetProducts): Promise<Product[]> => {
+    const response = await api.get(RESOURSE, { params: filters });
     return response.data;
   },
   createProduct: async (payload: CreateProductReq): Promise<Product> => {
