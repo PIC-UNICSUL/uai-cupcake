@@ -1,44 +1,53 @@
-import { useEffect, useState } from 'react'
-import { Helmet } from 'react-helmet-async'
+import { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 
-import { SelectMenu } from '@/components/menus'
-import { NavLink } from '@/components/nav-link'
-import { Pagination } from '@/components/pagination'
-import { SelectItem } from '@/components/ui/select'
-import { Separator } from '@/components/ui/separator'
+import { SelectMenu } from '@/components/menus';
+import { NavLink } from '@/components/nav-link';
+import { Pagination } from '@/components/pagination';
+import { SelectItem } from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
 import {
   Table,
   TableBody,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { useStore } from '@/store'
+} from '@/components/ui/table';
+import { useStore } from '@/store';
 
-import { OrderTableFilter } from './components/order-table-filter'
-import { OrderTableRow } from './components/order-table-row'
-import { useAuth } from '@/contexts/auth-context'
+import { OrderTableFilter } from './components/order-table-filter';
+import { OrderTableRow } from './components/order-table-row';
+import { useAuth } from '@/contexts/auth-context';
+import { useOrders } from '@/hooks/useOrders';
+import { useOrdersAdmin } from '@/hooks/useOrdersAdmin';
 
 export function Orders() {
-  const { user, orders, fetchAllOrders, fetchUserOrders } = useStore()
-  const { role} = useAuth()
+  const { orders, fetchAllOrders, fetchUserOrders } = useStore();
+  const { role, user } = useAuth();
 
-  const [pageIndex, setPageIndex] = useState(0)
-  const [timeFilter, setTimeFilter] = useState('month')
-  const [statusFilter, setStatusFilter] = useState('all')
+  const [pageIndex, setPageIndex] = useState(0);
+  const [timeFilter, setTimeFilter] = useState('month');
+  const [statusFilter, setStatusFilter] = useState('all');
 
-  const itemsPerPage = 6
+  // WIP: Refactor this to use the new hooks
+  const { orders: ordersMe } = useOrders(role ?? undefined);
+  const { orders: allOrders } = useOrdersAdmin(role ?? undefined);
+
+  const ordersA = role === 'ADMIN' ? allOrders : ordersMe;
+  console.log(ordersA, 'ordersA');
+
+  const itemsPerPage = 6;
 
   // Atualizar filtros
   const handleFilterChange = (filterType: 'time' | 'status', value: string) => {
-    if (filterType === 'time') setTimeFilter(value)
-    if (filterType === 'status') setStatusFilter(value)
-  }
+    if (filterType === 'time') setTimeFilter(value);
+    if (filterType === 'status') setStatusFilter(value);
+  };
 
   // Filtrar os pedidos
-  const filteredOrders = orders.filter((order) => {
-    const now = new Date()
-    const orderDate = new Date(order.created_at)
+  const filteredOrders = orders?.filter((order) => {
+    const now = new Date();
+    const orderDate = new Date(order.createdAt);
 
     const timeCondition =
       timeFilter === 'month'
@@ -48,29 +57,29 @@ export function Orders() {
           ? orderDate >= new Date(now.setDate(now.getDate() - 7))
           : timeFilter === 'year'
             ? orderDate.getFullYear() === now.getFullYear()
-            : true
+            : true;
 
     const statusCondition =
-      statusFilter === 'all' || order.status === statusFilter
+      statusFilter === 'all' || order.status === statusFilter;
 
-    return timeCondition && statusCondition
-  })
+    return timeCondition && statusCondition;
+  });
 
   // Pedidos paginados
-  const paginatedOrders = filteredOrders.slice(
+  const paginatedOrders = filteredOrders?.slice(
     pageIndex * itemsPerPage,
     (pageIndex + 1) * itemsPerPage,
-  )
+  );
 
   useEffect(() => {
     if (user) {
       if (role === 'ADMIN') {
-        fetchAllOrders()
+        fetchAllOrders();
       } else {
-        fetchUserOrders(user.email)
+        fetchUserOrders(user.mail);
       }
     }
-  }, [user, fetchUserOrders, fetchAllOrders])
+  }, [user, fetchUserOrders, fetchAllOrders]);
 
   return (
     <>
@@ -81,7 +90,7 @@ export function Orders() {
             Pedidos
           </h1>
           <div>
-            {orders.length > 0 ? (
+            {orders?.length > 0 ? (
               <div>
                 <OrderTableFilter
                   timeFilter={timeFilter}
@@ -104,15 +113,15 @@ export function Orders() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {paginatedOrders.map((order) => (
-                          <OrderTableRow key={order.order_id} order={order} />
+                        {paginatedOrders?.map((order) => (
+                          <OrderTableRow key={order.id} order={order} />
                         ))}
                       </TableBody>
                     </Table>
                   </div>
                   <Pagination
                     pageIndex={pageIndex}
-                    totalCount={filteredOrders.length}
+                    totalCount={filteredOrders?.length ?? 0}
                     perPage={itemsPerPage}
                     onPageChange={(newPage) => setPageIndex(newPage)}
                   />
@@ -172,15 +181,15 @@ export function Orders() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {paginatedOrders.map((order) => (
-                        <OrderTableRow key={order.order_id} order={order} />
+                      {paginatedOrders?.map((order) => (
+                        <OrderTableRow key={order.id} order={order} />
                       ))}
                     </TableBody>
                   </Table>
                 </div>
                 <Pagination
                   pageIndex={pageIndex}
-                  totalCount={filteredOrders.length}
+                  totalCount={filteredOrders?.length ?? 0}
                   perPage={itemsPerPage}
                   onPageChange={(newPage) => setPageIndex(newPage)}
                 />
@@ -194,5 +203,5 @@ export function Orders() {
         </div>
       )}
     </>
-  )
+  );
 }

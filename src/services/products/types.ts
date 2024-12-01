@@ -1,3 +1,5 @@
+type AvailabilityStatus = 'AVAILABLE' | 'UNAVAILABLE';
+
 interface Product {
   id: string;
   name: string;
@@ -5,7 +7,7 @@ interface Product {
   category: string;
   price: number;
   photos: any;
-  availabilityStatus: string;
+  availabilityStatus: AvailabilityStatus;
 }
 
 interface CreateProductReq {
@@ -18,7 +20,7 @@ interface CreateProductReq {
 
 interface UpdateProductAvailabilityReq {
   id: string;
-  availabilityStatus: string;
+  availabilityStatus: AvailabilityStatus;
 }
 
 interface ParamsGetProducts {
